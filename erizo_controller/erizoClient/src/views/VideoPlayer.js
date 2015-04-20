@@ -131,7 +131,7 @@ Erizo.VideoPlayer = function(spec) {
 
     that.parentNode = that.div.parentNode;
 
-    that.div.appendChild(that.loader);
+    // that.div.appendChild(that.loader);
     that.div.appendChild(that.video);
 
     that.containerWidth = 0;
