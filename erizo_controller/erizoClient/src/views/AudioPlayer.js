@@ -5,12 +5,12 @@
  * A AudioPlayer is also a View component.
  */
 var Erizo = Erizo || {};
-Erizo.AudioPlayer = function (spec) {
+Erizo.AudioPlayer = function(spec) {
     "use strict";
 
-    var that = Erizo.View({}),
-        onmouseover,
-        onmouseout;
+    var that = Erizo.View({});
+    // onmouseover,
+    // onmouseout;
 
     // Variables
 
@@ -34,29 +34,29 @@ Erizo.AudioPlayer = function (spec) {
     that.audio.setAttribute('style', 'width: 100%; height: 100%; position: absolute');
     that.audio.setAttribute('autoplay', 'autoplay');
 
-    if(spec.stream.local) 
+    if (spec.stream.local)
         that.audio.volume = 0;
 
-    if(spec.stream.local) 
+    if (spec.stream.local)
         that.audio.volume = 0;
 
 
     if (that.elementID !== undefined) {
 
         // It will stop the AudioPlayer and remove it from the HTML
-        that.destroy = function () {
+        that.destroy = function() {
             that.audio.pause();
             //clearInterval(that.resize);
             that.parentNode.removeChild(that.div);
         };
 
-        onmouseover = function (evt) {
-            that.bar.display();
-        };
+        // onmouseover = function (evt) {
+        //     that.bar.display();
+        // };
 
-        onmouseout = function (evt) {
-            that.bar.hide();
-        };
+        // onmouseout = function (evt) {
+        //     that.bar.hide();
+        // };
 
         // Container
         that.div = document.createElement('div');
@@ -71,14 +71,14 @@ Erizo.AudioPlayer = function (spec) {
         that.div.appendChild(that.audio);
 
         // Bottom Bar
-        that.bar = new Erizo.Bar({elementID: 'player_' + that.id, id: that.id, stream: spec.stream, media: that.audio, options: spec.options});
+        // that.bar = new Erizo.Bar({elementID: 'player_' + that.id, id: that.id, stream: spec.stream, media: that.audio, options: spec.options});
 
-        that.div.onmouseover = onmouseover;
-        that.div.onmouseout = onmouseout;
+        // that.div.onmouseover = onmouseover;
+        // that.div.onmouseout = onmouseout;
 
     } else {
         // It will stop the AudioPlayer and remove it from the HTML
-        that.destroy = function () {
+        that.destroy = function() {
             that.audio.pause();
             //clearInterval(that.resize);
             that.parentNode.removeChild(that.audio);
