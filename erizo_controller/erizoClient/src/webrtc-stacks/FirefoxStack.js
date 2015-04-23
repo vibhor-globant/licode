@@ -107,6 +107,7 @@ Erizo.FirefoxStack = function (spec) {
     var setLocalDesc = function (sessionDescription) {
         sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
         sessionDescription.sdp = sessionDescription.sdp.replace(/a=ice-options:google-ice\r\n/g, "");
+	sessionDescription = changeOrder(sessionDescription);
         spec.callback(sessionDescription);
         localDesc = sessionDescription;
     }
