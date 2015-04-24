@@ -24,12 +24,6 @@ enum HostType {
 enum MediaType {
     VIDEO_TYPE, AUDIO_TYPE, OTHER
 };
-/** 
- * Stream directions
- */
-enum StreamDirection {
-  SENDRECV, SENDONLY, RECVONLY
-};
 /**
  * RTP Profile
  */
@@ -85,18 +79,6 @@ public:
     std::string password;
     MediaType mediaType;
 };
-
-/**
- * A bundle tag
- */
-class BundleTag {
-  public:
-    BundleTag(std::string theId, MediaType theType):id(theId),mediaType(theType){
-    };
-    std::string id;
-    MediaType mediaType;
-};
-
 /**
  * A PT to Codec map
  */
@@ -218,8 +200,6 @@ public:
     * Is there rtcp muxing
     */
     bool isRtcpMux;
-    
-    StreamDirection direction;
     /**
     * RTP Profile type
     */
@@ -244,7 +224,6 @@ public:
      * The negotiated payload list
      */
     std::vector<RtpMap> payloadVector;
-    std::vector<BundleTag> bundleTags;
     /*
      * MLines for video and audio
      */
