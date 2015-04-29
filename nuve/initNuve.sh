@@ -6,6 +6,6 @@ CURRENT_DIR=`pwd`
 
 cd $ROOT/nuveAPI
 
-node nuve.js &
+pm2 start nuve.js
 
 cd $CURRENT_DIR

@@ -5,12 +5,12 @@
  * A VideoPlayer is also a View component.
  */
 var Erizo = Erizo || {};
-Erizo.VideoPlayer = function (spec) {
+Erizo.VideoPlayer = function(spec) {
     "use strict";
 
-    var that = Erizo.View({}),
-        onmouseover,
-        onmouseout;
+    var that = Erizo.View({});
+    // onmouseover,
+    // onmouseout;
 
     // Variables
 
@@ -24,24 +24,24 @@ Erizo.VideoPlayer = function (spec) {
     that.elementID = spec.elementID;
 
     // Private functions
-    onmouseover = function (evt) {
-        that.bar.display();
-    };
+    // onmouseover = function(evt) {
+    //     that.bar.display();
+    // };
 
-    onmouseout = function (evt) {
-        that.bar.hide();
-    };
+    // onmouseout = function(evt) {
+    //     that.bar.hide();
+    // };
 
     // Public functions
 
     // It will stop the VideoPlayer and remove it from the HTML
-    that.destroy = function () {
+    that.destroy = function() {
         that.video.pause();
         delete that.resizer;
         that.parentNode.removeChild(that.div);
     };
 
-    that.resize = function () {
+    that.resize = function() {
 
         var width = that.container.offsetWidth,
             height = that.container.offsetHeight;
@@ -107,10 +107,10 @@ Erizo.VideoPlayer = function (spec) {
     that.div.setAttribute('style', 'width: 100%; height: 100%; position: relative; background-color: black; overflow: hidden;');
 
     // Loader icon
-    that.loader = document.createElement('img');
-    that.loader.setAttribute('style', 'width: 16px; height: 16px; position: absolute; top: 50%; left: 50%; margin-top: -8px; margin-left: -8px');
-    that.loader.setAttribute('id', 'back_' + that.id);
-    that.loader.setAttribute('src', that.url + '/assets/loader.gif');
+    // that.loader = document.createElement('img');
+    // that.loader.setAttribute('style', 'width: 16px; height: 16px; position: absolute; top: 50%; left: 50%; margin-top: -8px; margin-left: -8px');
+    // that.loader.setAttribute('id', 'back_' + that.id);
+    // that.loader.setAttribute('src', that.url + '/assets/loader.gif');
 
     // Video tag
     that.video = document.createElement('video');
@@ -118,7 +118,7 @@ Erizo.VideoPlayer = function (spec) {
     that.video.setAttribute('style', 'width: 100%; height: 100%; position: absolute');
     that.video.setAttribute('autoplay', 'autoplay');
 
-    if(spec.stream.local) 
+    if (spec.stream.local)
         that.video.volume = 0;
 
     if (that.elementID !== undefined) {
@@ -131,7 +131,7 @@ Erizo.VideoPlayer = function (spec) {
 
     that.parentNode = that.div.parentNode;
 
-    that.div.appendChild(that.loader);
+    // that.div.appendChild(that.loader);
     that.div.appendChild(that.video);
 
     that.containerWidth = 0;
@@ -142,10 +142,16 @@ Erizo.VideoPlayer = function (spec) {
     that.resize();
 
     // Bottom Bar
-    that.bar = new Erizo.Bar({elementID: 'player_' + that.id, id: that.id, stream: spec.stream, media: that.video, options: spec.options});
+    // that.bar = new Erizo.Bar({
+    //     elementID: 'player_' + that.id,
+    //     id: that.id,
+    //     stream: spec.stream,
+    //     media: that.video,
+    //     options: spec.options
+    // });
 
-    that.div.onmouseover = onmouseover;
-    that.div.onmouseout = onmouseout;
+    // that.div.onmouseover = onmouseover;
+    // that.div.onmouseout = onmouseout;
 
     that.video.src = that.stream_url;
 

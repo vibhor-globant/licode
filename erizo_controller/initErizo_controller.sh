@@ -6,6 +6,6 @@ ROOT=`dirname $SCRIPT`
 CURRENT_DIR=`pwd`
 
 cd $ROOT/erizoController
-node erizoController.js &
+pm2 start erizoController.js
 
 cd $CURRENT_DIR
