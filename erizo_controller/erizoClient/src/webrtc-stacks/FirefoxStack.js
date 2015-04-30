@@ -120,7 +120,7 @@ Erizo.FirefoxStack = function (spec) {
             else lines += "\r\n" + matches[i];
         }
         sessionDescription.sdp = sessionDescription.sdp.replace(/^.*(rtcp-fb).*$\r\n/gm, "");
-        sessionDescription.sdp += lines;
+        sessionDescription.sdp += lines + "\r\n";
         return sessionDescription;
     }
 
