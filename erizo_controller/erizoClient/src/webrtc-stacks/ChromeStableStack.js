@@ -179,7 +179,7 @@ Erizo.ChromeStableStack = function(spec) {
                 that.peerConnection.createAnswer(setLocalDescp2p, null, that.mediaConstraints);
                 spec.remoteDescriptionSet = true;
             }, function(err) {
-                console.log("Set remote description failed with error: " + err);
+                console.log("Set remote description failed with error: " + err + ", msg = " + JSON.stringify(msg));
             });
 
         } else if (msg.type === 'answer') {
