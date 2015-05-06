@@ -134,6 +134,10 @@ Erizo.ChromeStableStack = function(spec) {
         }
     };
 
+    that.peerConnection.onnegotiationneeded = function() {
+        console.log("peerConnection.onnegotiationneeded");
+    };
+
     var localDesc;
 
     var setLocalDesc = function(sessionDescription) {
