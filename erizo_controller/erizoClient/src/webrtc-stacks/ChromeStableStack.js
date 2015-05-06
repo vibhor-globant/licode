@@ -85,12 +85,14 @@ Erizo.ChromeStableStack = function(spec) {
      */
     that.close = function() {
         that.state = 'closed';
+        console.log("close: calling peerConnection.close");
         that.peerConnection.close();
     };
 
     spec.localCandidates = [];
 
     that.peerConnection.onicecandidate = function(event) {
+        console.log("peerConnection.onicecandidate");
         if (event.candidate) {
 
             if (!event.candidate.candidate.match(/a=/)) {
@@ -119,12 +121,14 @@ Erizo.ChromeStableStack = function(spec) {
     };
 
     that.peerConnection.onaddstream = function(stream) {
+        console.log("peerConnection.onaddstream");
         if (that.onaddstream) {
             that.onaddstream(stream);
         }
     };
 
     that.peerConnection.onremovestream = function(stream) {
+        console.log("peerConnection.onremovestream");
         if (that.onremovestream) {
             that.onremovestream(stream);
         }
@@ -133,6 +137,7 @@ Erizo.ChromeStableStack = function(spec) {
     var localDesc;
 
     var setLocalDesc = function(sessionDescription) {
+        console.log("setLocalDesc");
         sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
         sessionDescription.sdp = sessionDescription.sdp.replace(/a=ice-options:google-ice\r\n/g, "");
         spec.callback({
@@ -144,6 +149,7 @@ Erizo.ChromeStableStack = function(spec) {
     }
 
     var setLocalDescp2p = function(sessionDescription) {
+        console.log("setLocalDescp2p");
         sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
         sessionDescription.sdp = sessionDescription.sdp.replace(/a=ice-options:google-ice\r\n/g, "");
         spec.callback({
@@ -151,7 +157,11 @@ Erizo.ChromeStableStack = function(spec) {
             sdp: sessionDescription.sdp
         });
         localDesc = sessionDescription;
-        that.peerConnection.setLocalDescription(sessionDescription);
+        that.peerConnection.setLocalDescription(sessionDescription, function() {
+            console.log("setLocalDescp2p: setLocalDescription successful");
+        }, function(err) {
+            console.log("setLocalDescp2p: setLocalDescription error = " + err);
+        });
     }
 
     that.createOffer = function(isSubscribe) {
@@ -164,6 +174,7 @@ Erizo.ChromeStableStack = function(spec) {
     };
 
     that.addStream = function(stream) {
+        console.log("addStream calling peerConnection.addStream");
         that.peerConnection.addStream(stream);
     };
     spec.remoteCandidates = [];
@@ -176,7 +187,10 @@ Erizo.ChromeStableStack = function(spec) {
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
             that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
-                that.peerConnection.createAnswer(setLocalDescp2p, null, that.mediaConstraints);
+                console.log("processSignalingMessage: peerConnection.setRemoteDescription successful");
+                that.peerConnection.createAnswer(setLocalDescp2p, function(err) {
+                    console.log("processSignalingMessage: peerConnection.createAnswer error = " + err);
+                }, that.mediaConstraints);
                 spec.remoteDescriptionSet = true;
             }, function(err) {
                 console.log("Set remote description failed with error: " + err + ", msg = " + JSON.stringify(msg));
@@ -196,11 +210,13 @@ Erizo.ChromeStableStack = function(spec) {
             msg.sdp = setMaxBW(msg.sdp);
 
             that.peerConnection.setLocalDescription(localDesc, function() {
+                console.log("processSignalingMessage: peerConnection.setLocalDescription successful");
                 that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
                     spec.remoteDescriptionSet = true;
                     console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
                     while (spec.remoteCandidates.length > 0) {
                         // IMPORTANT: preserve ordering of candidates
+                        console.log("processSignalingMessage: calling peerConnection.addIceCandidate");
                         that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
                     }
                     console.log("Local candidates to send:", spec.localCandidates.length);
@@ -211,8 +227,11 @@ Erizo.ChromeStableStack = function(spec) {
                             candidate: spec.localCandidates.shift()
                         });
                     }
-
+                }, function(err) {
+                    console.log("processSignalingMessage: peerConnection.setRemoteDescription error = " + err);
                 });
+            }, function(err) {
+                console.log("processSignalingMessage: peerConnection.setLocalDescription error = " + err);
             });
 
         } else if (msg.type === 'candidate') {
@@ -227,6 +246,7 @@ Erizo.ChromeStableStack = function(spec) {
                 obj.sdpMLineIndex = parseInt(obj.sdpMLineIndex);
                 var candidate = new RTCIceCandidate(obj);
                 if (spec.remoteDescriptionSet) {
+                    console.log("processSignalingMessage: calling peerConnection.addIceCandidate");
                     that.peerConnection.addIceCandidate(candidate);
                 } else {
                     spec.remoteCandidates.push(candidate);
