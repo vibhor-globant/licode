@@ -169,6 +169,7 @@ Erizo.ChromeStableStack = function(spec) {
             sdp: sessionDescription.sdp
         });
         localDesc = sessionDescription;
+        console.log("setLocalDescp2p: calling peerConnection.setLocalDescription");
         that.peerConnection.setLocalDescription(sessionDescription, function() {
             console.log("setLocalDescp2p: setLocalDescription successful");
         }, function(err) {
@@ -177,6 +178,7 @@ Erizo.ChromeStableStack = function(spec) {
     }
 
     that.createOffer = function(isSubscribe) {
+        console.log("createOffer: calling peerConnection.createOffer");
         if (isSubscribe === true) {
             that.peerConnection.createOffer(setLocalDesc, errorCallback, that.mediaConstraints);
         } else {
@@ -198,8 +200,10 @@ Erizo.ChromeStableStack = function(spec) {
 
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
+            console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
             that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
                 console.log("processSignalingMessage: peerConnection.setRemoteDescription successful");
+                console.log("processSignalingMessage: calling peerConnection.createAnswer");
                 that.peerConnection.createAnswer(setLocalDescp2p, function(err) {
                     console.log("processSignalingMessage: peerConnection.createAnswer error = " + err);
                 }, that.mediaConstraints);
@@ -221,8 +225,10 @@ Erizo.ChromeStableStack = function(spec) {
 
             msg.sdp = setMaxBW(msg.sdp);
 
+            console.log("processSignalingMessage: calling peerConnection.setLocalDescription");
             that.peerConnection.setLocalDescription(localDesc, function() {
                 console.log("processSignalingMessage: peerConnection.setLocalDescription successful");
+                console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
                 that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
                     spec.remoteDescriptionSet = true;
                     console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
