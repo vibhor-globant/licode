@@ -138,6 +138,14 @@ Erizo.ChromeStableStack = function(spec) {
         console.log("peerConnection.onnegotiationneeded");
     };
 
+    that.peerConnection.oniceconnectionstatechange = function(evt) {
+        cnosole.log("peerConnection.oniceconnectionstatechange event = " + evt);
+    };
+
+    that.peerConnection.onsignalingstatechange = function(evt) {
+        console.log("peerConnection.onsignalingstatechange event = " + evt);
+    };
+
     var localDesc;
 
     var setLocalDesc = function(sessionDescription) {
