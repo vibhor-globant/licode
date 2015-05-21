@@ -1,5 +1,7 @@
 /*global window, console, navigator*/
 
+var AdapterJS = AdapterJS || {};
+
 var Erizo = Erizo || {};
 
 Erizo.sessionId = 103;
