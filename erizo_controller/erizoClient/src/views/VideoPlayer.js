@@ -98,8 +98,8 @@ Erizo.VideoPlayer = function(spec) {
     });*/
 
     L.Logger.debug('Creating URL from stream ' + that.stream);
-    var myURL = window.URL || webkitURL;
-    that.stream_url = myURL.createObjectURL(that.stream);
+    // var myURL = window.URL || webkitURL;
+    // that.stream_url = myURL.createObjectURL(that.stream);
 
     // Container
     that.div = document.createElement('div');
@@ -153,7 +153,8 @@ Erizo.VideoPlayer = function(spec) {
     // that.div.onmouseover = onmouseover;
     // that.div.onmouseout = onmouseout;
 
-    that.video.src = that.stream_url;
+    // that.video.src = that.stream_url;
+    attachMediaStream(that.video, that.stream);
 
     return that;
 };

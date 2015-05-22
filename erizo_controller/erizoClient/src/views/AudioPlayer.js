@@ -25,8 +25,8 @@ Erizo.AudioPlayer = function(spec) {
 
 
     L.Logger.debug('Creating URL from stream ' + that.stream);
-    var myURL = window.URL || webkitURL;
-    that.stream_url = myURL.createObjectURL(that.stream);
+    // var myURL = window.URL || webkitURL;
+    // that.stream_url = myURL.createObjectURL(that.stream);
 
     // Audio tag
     that.audio = document.createElement('audio');
@@ -88,7 +88,8 @@ Erizo.AudioPlayer = function(spec) {
         that.parentNode = document.body;
     }
 
-    that.audio.src = that.stream_url;
+    // that.audio.src = that.stream_url;
+    attachMediaStream(that.audio, that.stream);
 
     return that;
 };
