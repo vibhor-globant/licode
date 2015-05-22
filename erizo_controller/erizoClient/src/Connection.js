@@ -1,7 +1,5 @@
 /*global window, console, navigator*/
 
-var AdapterJS = AdapterJS || {};
-
 var Erizo = Erizo || {};
 
 Erizo.sessionId = 103;
@@ -27,6 +25,8 @@ Erizo.Connection = function (spec) {
     } else if (that.browser === 'chrome-stable') {
         L.Logger.debug("Stable!");
         that = Erizo.ChromeStableStack(spec);
+    } else if (that.browser === "Safari") {
+        that = Erizo.SafariStableStack(spec);
     } else {
         L.Logger.debug("None!");
         throw "WebRTC stack not available";
@@ -50,7 +50,7 @@ Erizo.getBrowser = function () {
             browser = "chrome-stable";
         }
     } else if (window.navigator.userAgent.match("Safari") !== null) {
-        browser = "bowser";
+        browser = "Safari";
     } else if (window.navigator.userAgent.match("AppleWebKit") !== null) {
         browser = "bowser";
     }
