@@ -104,7 +104,7 @@ Erizo.VideoPlayer = function(spec) {
     // Container
     that.div = document.createElement('div');
     that.div.setAttribute('id', 'player_' + that.id);
-    that.div.setAttribute('style', 'width: 100%; height: 100%; position: relative; background-color: black; overflow: hidden;');
+    that.div.setAttribute('style', 'width: 100%; height: 100%; position: absolute; background-color: black; overflow: hidden;');
 
     // Loader icon
     // that.loader = document.createElement('img');
