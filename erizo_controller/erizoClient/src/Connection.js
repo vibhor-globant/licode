@@ -25,7 +25,7 @@ Erizo.Connection = function (spec) {
     } else if (that.browser === 'chrome-stable') {
         L.Logger.debug("Stable!");
         that = Erizo.ChromeStableStack(spec);
-    } else if (that.browser === "Safari") {
+    } else if (that.browser === "safari") {
         that = Erizo.SafariStableStack(spec);
     } else {
         L.Logger.debug("None!");
@@ -50,7 +50,7 @@ Erizo.getBrowser = function () {
             browser = "chrome-stable";
         }
     } else if (window.navigator.userAgent.match("Safari") !== null) {
-        browser = "Safari";
+        browser = "safari";
     } else if (window.navigator.userAgent.match("AppleWebKit") !== null) {
         browser = "bowser";
     }
