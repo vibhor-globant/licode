@@ -89,7 +89,9 @@ Erizo.AudioPlayer = function(spec) {
     }
 
     // that.audio.src = that.stream_url;
-    attachMediaStream(that.audio, that.stream);
+    setTimeout(function() {
+        that.audio = attachMediaStream(that.audio, that.stream, {autoplay: true, muted: false});
+    }, 1000);
 
     return that;
 };

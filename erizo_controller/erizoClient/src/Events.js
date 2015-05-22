@@ -3,6 +3,9 @@
  * Class EventDispatcher provides event handling to sub-classes.
  * It is inherited from Publisher, Room, etc.
  */
+
+var AdapterJS = AdapterJS || {};
+
 var Erizo = Erizo || {};
 Erizo.EventDispatcher = function (spec) {
     "use strict";

@@ -1,10 +1,8 @@
 /*global window, console, RTCSessionDescription, RoapConnection, webkitRTCPeerConnection*/
 
-var AdapterJS = AdapterJS || {};
-
 var Erizo = Erizo || {};
 
-Erizo.SafariStableStack = function(spec) {
+Erizo.InternetExplorerStack = function(spec) {
     "use strict";
 
     var that = {},

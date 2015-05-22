@@ -26,7 +26,9 @@ Erizo.Connection = function (spec) {
         L.Logger.debug("Stable!");
         that = Erizo.ChromeStableStack(spec);
     } else if (that.browser === "safari") {
-        that = Erizo.SafariStableStack(spec);
+        that = Erizo.SafariStack(spec);
+    } else if (that.browser === "ie") {
+      that = Erizo.InternetExplorerStack(spec);
     } else {
         L.Logger.debug("None!");
         throw "WebRTC stack not available";
@@ -51,6 +53,8 @@ Erizo.getBrowser = function () {
         }
     } else if (window.navigator.userAgent.match("Safari") !== null) {
         browser = "safari";
+    } else if (window.navigator.userAgent.match("Trident") || window.navigator.userAgent.match("MSIE")) {
+      browser = "ie";
     } else if (window.navigator.userAgent.match("AppleWebKit") !== null) {
         browser = "bowser";
     }
