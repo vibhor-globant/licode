@@ -42,7 +42,8 @@ Erizo.VideoPlayer = function(spec) {
     };
 
     that.resize = function() {
-
+        return;
+        
         var width = that.container.offsetWidth,
             height = that.container.offsetHeight;
 
