@@ -154,7 +154,7 @@ Erizo.VideoPlayer = function(spec) {
     // that.div.onmouseout = onmouseout;
 
     // that.video.src = that.stream_url;
-    attachMediaStream(that.video, that.stream);
+    attachMediaStream(that.video, that.stream.stream);
 
     return that;
 };
