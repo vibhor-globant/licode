@@ -2,6 +2,7 @@
 #define BUILDING_NODE_EXTENSION
 #endif
 #include <node.h>
+#include <nan.h>
 #include "WebRtcConnection.h"
 #include "OneToManyProcessor.h"
 #include "OneToManyTranscoder.h"
