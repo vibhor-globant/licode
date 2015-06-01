@@ -56,6 +56,7 @@ Erizo.ChromeStableStack = function(spec) {
 
     var setMaxBW = function(sdp) {
         if (spec.video && spec.maxVideoBW) {
+            sdp = sdp.replace(/b=AS:.*\r\n/g, "");
             var a = sdp.match(/m=video.*\r\n/);
             if (a == null) {
                 a = sdp.match(/m=video.*\n/);
@@ -147,6 +148,7 @@ Erizo.ChromeStableStack = function(spec) {
     };
 
     var localDesc;
+    var remoteDesc;
 
     var setLocalDesc = function(sessionDescription) {
         console.log("setLocalDesc");
@@ -177,14 +179,43 @@ Erizo.ChromeStableStack = function(spec) {
         });
     }
 
-    that.createOffer = function(isSubscribe) {
-        console.log("createOffer: calling peerConnection.createOffer");
-        if (isSubscribe === true) {
-            that.peerConnection.createOffer(setLocalDesc, errorCallback, that.mediaConstraints);
-        } else {
-            that.peerConnection.createOffer(setLocalDesc, errorCallback);
-        }
+    that.updateSpec = function (config, callback){
+        if (config.maxVideoBW || config.maxAudioBW ){
+            if (config.maxVideoBW){
+                console.log ("Maxvideo Requested", config.maxVideoBW, "limit", spec.limitMaxVideoBW);
+                if (config.maxVideoBW > spec.limitMaxVideoBW) {
+                    config.maxVideoBW = spec.limitMaxVideoBW;
+                }
+                spec.maxVideoBW = config.maxVideoBW; 
+                console.log ("Result", spec.maxVideoBW);
+            }
+            if (config.maxAudioBW){
+                if (config.maxAudioBW > spec.limitMaxAudioBW) {
+                    config.maxAudioBW = spec.limitMaxAudioBW;
+                }
+                spec.maxAudioBW = config.maxAudioBW; 
+            }
 
+            localDesc.sdp = setMaxBW(localDesc.sdp);
+            that.peerConnection.setLocalDescription(localDesc, function(){
+                remoteDesc.sdp = setMaxBW(remoteDesc.sdp);
+                that.peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDesc), function() {
+                    spec.remoteDescriptionSet = true;
+                    if (callback)
+                        callback("success");
+
+                });
+            });
+        }
+        
+    };
+
+    that.createOffer = function (isSubscribe) {
+      if (isSubscribe===true){
+          that.peerConnection.createOffer(setLocalDesc, errorCallback, that.mediaConstraints);
+      }else{
+          that.peerConnection.createOffer(setLocalDesc, errorCallback);
+      }
     };
 
     that.addStream = function(stream) {
@@ -225,31 +256,22 @@ Erizo.ChromeStableStack = function(spec) {
 
             msg.sdp = setMaxBW(msg.sdp);
 
-            console.log("processSignalingMessage: calling peerConnection.setLocalDescription");
-            that.peerConnection.setLocalDescription(localDesc, function() {
-                console.log("processSignalingMessage: peerConnection.setLocalDescription successful");
-                console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
-                that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
-                    spec.remoteDescriptionSet = true;
-                    console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
-                    while (spec.remoteCandidates.length > 0) {
-                        // IMPORTANT: preserve ordering of candidates
-                        console.log("processSignalingMessage: calling peerConnection.addIceCandidate");
-                        that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
-                    }
-                    console.log("Local candidates to send:", spec.localCandidates.length);
-                    while (spec.localCandidates.length > 0) {
-                        // IMPORTANT: preserve ordering of candidates
-                        spec.callback({
-                            type: 'candidate',
-                            candidate: spec.localCandidates.shift()
-                        });
-                    }
-                }, function(err) {
-                    console.log("processSignalingMessage: peerConnection.setRemoteDescription error = " + err);
-                });
-            }, function(err) {
-                console.log("processSignalingMessage: peerConnection.setLocalDescription error = " + err);
+            remoteDesc = msg;
+            that.peerConnection.setLocalDescription(localDesc, function(){
+              that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
+                spec.remoteDescriptionSet = true;
+                console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
+                while (spec.remoteCandidates.length > 0) {
+                // IMPORTANT: preserve ordering of candidates
+                  that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
+                }
+                console.log("Local candidates to send:" , spec.localCandidates.length);
+                while(spec.localCandidates.length > 0) {
+                // IMPORTANT: preserve ordering of candidates
+                  spec.callback({type:'candidate', candidate: spec.localCandidates.shift()});
+                }
+
+              });
             });
 
         } else if (msg.type === 'candidate') {
