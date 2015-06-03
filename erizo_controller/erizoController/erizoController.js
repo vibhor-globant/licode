@@ -19,12 +19,12 @@ GLOBAL.config.erizoController.publicIP = GLOBAL.config.erizoController.publicIP 
 GLOBAL.config.erizoController.hostname = GLOBAL.config.erizoController.hostname|| '';
 GLOBAL.config.erizoController.port = GLOBAL.config.erizoController.port || 8080;
 GLOBAL.config.erizoController.ssl = GLOBAL.config.erizoController.ssl || false;
-GLOBAL.config.erizoController.turnServer = GLOBAL.config.erizoController.turnServer || undefined;
-if (config.erizoController.turnServer !== undefined) {
-    GLOBAL.config.erizoController.turnServer.url = GLOBAL.config.erizoController.turnServer.url || '';
-    GLOBAL.config.erizoController.turnServer.username = GLOBAL.config.erizoController.turnServer.username || '';
-    GLOBAL.config.erizoController.turnServer.password = GLOBAL.config.erizoController.turnServer.password || '';
-}
+GLOBAL.config.erizoController.turnServers = GLOBAL.config.erizoController.turnServers || undefined;
+// if (config.erizoController.turnServers !== undefined) {
+//     GLOBAL.config.erizoController.turnServer.url = GLOBAL.config.erizoController.turnServer.url || '';
+//     GLOBAL.config.erizoController.turnServer.username = GLOBAL.config.erizoController.turnServer.username || '';
+//     GLOBAL.config.erizoController.turnServer.password = GLOBAL.config.erizoController.turnServer.password || '';
+// }
 GLOBAL.config.erizoController.warning_n_rooms = GLOBAL.config.erizoController.warning_n_rooms || 15;
 GLOBAL.config.erizoController.limit_n_rooms = GLOBAL.config.erizoController.limit_n_rooms || 20;
 GLOBAL.config.erizoController.interval_time_keepAlive = GLOBAL.config.erizoController.interval_time_keepAlive || 1000;
@@ -373,7 +373,7 @@ var listen = function () {
                                             defaultVideoBW: GLOBAL.config.erizoController.defaultVideoBW,
                                             maxVideoBW: GLOBAL.config.erizoController.maxVideoBW,
                                             stunServerUrl: GLOBAL.config.erizoController.stunServerUrl,
-                                            turnServer: GLOBAL.config.erizoController.turnServer
+                                            turnServers: GLOBAL.config.erizoController.turnServers
                                             });
 
                     } else {
