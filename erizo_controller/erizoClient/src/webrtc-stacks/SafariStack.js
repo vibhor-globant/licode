@@ -25,13 +25,22 @@ Erizo.SafariStack = function(spec) {
         });
     }
 
-    if ((spec.turnServer || {}).url) {
-        that.pc_config.iceServers.push({
-            "username": spec.turnServer.username,
-            "credential": spec.turnServer.password,
-            "url": spec.turnServer.url
-        });
-    }
+    // if ((spec.turnServer || {}).url) {
+    //     that.pc_config.iceServers.push({
+    //         "username": spec.turnServer.username,
+    //         "credential": spec.turnServer.password,
+    //         "url": spec.turnServer.url
+    //     });
+    // }
+    (spec.turnServers || []).forEach(function(turnServer) {
+        if (turnServer.url) {
+            that.pc_config.iceServers.push({
+                username: turnServer.username,
+                credential: turnServer.password,
+                url: turnServer.url
+            });
+        }
+    });
 
     if (spec.audio === undefined) {
         spec.audio = true;
