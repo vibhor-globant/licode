@@ -155,7 +155,7 @@ Erizo.Room = function (spec) {
 
             myStream.pc[arg.peerSocket] = Erizo.Connection({callback: function (msg) {
                 sendSDPSocket('signaling_message', {streamId: arg.streamId, peerSocket: arg.peerSocket, msg: msg});
-            }, audio: myStream.hasAudio(), video: myStream.hasVideo(), stunServerUrl: that.stunServerUrl, turnServer: that.turnServer});
+            }, audio: myStream.hasAudio(), video: myStream.hasVideo(), stunServerUrl: that.stunServerUrl, turnServers: that.turnServers});
 
 
             myStream.pc[arg.peerSocket].oniceconnectionstatechange = function (state) {
@@ -173,7 +173,7 @@ Erizo.Room = function (spec) {
 
             stream.pc = Erizo.Connection({callback: function (msg) {
                 sendSDPSocket('signaling_message', {streamId: stream.getID(), peerSocket: peerSocket, msg: msg});
-            }, stunServerUrl: that.stunServerUrl, turnServer: that.turnServer, maxAudioBW: spec.maxAudioBW, maxVideoBW: spec.maxVideoBW, limitMaxAudioBW:spec.maxAudioBW, limitMaxVideoBW: spec.maxVideoBW});
+            }, stunServerUrl: that.stunServerUrl, turnServers: that.turnServers, maxAudioBW: spec.maxAudioBW, maxVideoBW: spec.maxVideoBW, limitMaxAudioBW:spec.maxAudioBW, limitMaxVideoBW: spec.maxVideoBW});
 
             stream.pc.onaddstream = function (evt) {
                 // Draw on html
@@ -279,7 +279,7 @@ Erizo.Room = function (spec) {
             that.p2p = response.p2p;
             roomId = response.id;
             that.stunServerUrl = response.stunServerUrl;
-            that.turnServer = response.turnServer;
+            that.turnServers = response.turnServers;
             that.state = CONNECTED;
             spec.defaultVideoBW = response.defaultVideoBW;
             spec.maxVideoBW = response.maxVideoBW;
@@ -421,7 +421,7 @@ Erizo.Room = function (spec) {
                         stream.pc = Erizo.Connection({callback: function (message) {
                             console.log("Sending message", message);
                             sendSDPSocket('signaling_message', {streamId: stream.getID(), msg: message}, undefined, function () {});
-                        }, stunServerUrl: that.stunServerUrl, turnServer: that.turnServer, maxAudioBW: options.maxAudioBW, maxVideoBW: options.maxVideoBW, limitMaxAudioBW: spec.maxAudioBW, limitMaxVideoBW: spec.maxVideoBW,audio:stream.hasAudio(), video: stream.hasVideo()});
+                        }, stunServerUrl: that.stunServerUrl, turnServers: that.turnServers, maxAudioBW: options.maxAudioBW, maxVideoBW: options.maxVideoBW, limitMaxAudioBW: spec.maxAudioBW, limitMaxVideoBW: spec.maxVideoBW,audio:stream.hasAudio(), video: stream.hasVideo()});
                         
                         stream.pc.addStream(stream.stream);
                         stream.pc.createOffer();
@@ -545,7 +545,7 @@ Erizo.Room = function (spec) {
                         stream.pc = Erizo.Connection({callback: function (message) {
                             L.Logger.info("Sending message", message);
                             sendSDPSocket('signaling_message', {streamId: stream.getID(), msg: message, browser: stream.pc.browser}, undefined, function () {});
-                        }, nop2p: true, audio: stream.hasAudio(), video: stream.hasVideo(), stunServerUrl: that.stunServerUrl, turnServer: that.turnServer});
+                        }, nop2p: true, audio: stream.hasAudio(), video: stream.hasVideo(), stunServerUrl: that.stunServerUrl, turnServers: that.turnServers});
 
                         stream.pc.onaddstream = function (evt) {
                             // Draw on html

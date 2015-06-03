@@ -55,10 +55,13 @@ config.erizoController.ssl = false; //default value: false
 // config.erizoController.networkInterface = 'eth1' // default value: undefined
 
 //Use undefined to run clients without Turn
-config.erizoController.turnServer = {}; // default value: undefined
-config.erizoController.turnServer.url = ''; // default value: null
-config.erizoController.turnServer.username = ''; // default value: null
-config.erizoController.turnServer.password = ''; // default value: null
+// config.erizoController.turnServer = {}; // default value: undefined
+// config.erizoController.turnServer.url = ''; // default value: null
+// config.erizoController.turnServer.username = ''; // default value: null
+// config.erizoController.turnServer.password = ''; // default value: null
+// Support multiple turn servers
+config.erizoController.turnServers = []; // default value: undefined
+config.erizoController.turnServers[0] = {url: '', username: '', password: ''};  // first turn server
 
 config.erizoController.warning_n_rooms = 15; // default value: 15
 config.erizoController.limit_n_rooms = 20; // default value: 20
