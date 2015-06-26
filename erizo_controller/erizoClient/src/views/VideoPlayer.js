@@ -38,12 +38,15 @@ Erizo.VideoPlayer = function(spec) {
     that.destroy = function() {
         that.video.pause();
         delete that.resizer;
-        that.parentNode.removeChild(that.div);
+        //that.parentNode.removeChild(that.div);
+        if (that.div && that.div.parentNode == that.container) {
+            that.container.removeChild(that.div);
+        }
     };
 
     that.resize = function() {
         return;
-        
+
         // var width = that.container.offsetWidth,
         //     height = that.container.offsetHeight;
 
@@ -123,11 +126,11 @@ Erizo.VideoPlayer = function(spec) {
         that.video.volume = 0;
 
     if (that.elementID !== undefined) {
-        document.getElementById(that.elementID).appendChild(that.div);
         that.container = document.getElementById(that.elementID);
+        that.container.appendChild(that.div);
     } else {
-        document.body.appendChild(that.div);
         that.container = document.body;
+        that.container.appendChild(that.div);
     }
 
     that.parentNode = that.div.parentNode;
