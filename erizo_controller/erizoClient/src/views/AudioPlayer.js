@@ -5,7 +5,7 @@
  * A AudioPlayer is also a View component.
  */
 var Erizo = Erizo || {};
-Erizo.AudioPlayer = function(spec) {
+Erizo.AudioPlayer = function (spec) {
     "use strict";
 
     var that = Erizo.View({});
@@ -44,10 +44,13 @@ Erizo.AudioPlayer = function(spec) {
     if (that.elementID !== undefined) {
 
         // It will stop the AudioPlayer and remove it from the HTML
-        that.destroy = function() {
+        that.destroy = function () {
             that.audio.pause();
             //clearInterval(that.resize);
-            that.parentNode.removeChild(that.div);
+            //            that.parentNode.removeChild(that.div);
+            if (that.div && that.div.parentNode == that.container) {
+                that.container.removeChild(that.div);
+            }
         };
 
         // onmouseover = function (evt) {
@@ -78,10 +81,13 @@ Erizo.AudioPlayer = function(spec) {
 
     } else {
         // It will stop the AudioPlayer and remove it from the HTML
-        that.destroy = function() {
+        that.destroy = function () {
             that.audio.pause();
             //clearInterval(that.resize);
-            that.parentNode.removeChild(that.audio);
+//            that.parentNode.removeChild(that.audio);
+            if (that.audio.parentNode == that.body) {
+                that.body.removeChild(that.audio);
+            }
         };
 
         document.body.appendChild(that.audio);
@@ -89,8 +95,11 @@ Erizo.AudioPlayer = function(spec) {
     }
 
     // that.audio.src = that.stream_url;
-    setTimeout(function() {
-        that.audio = attachMediaStream(that.audio, that.stream, {autoplay: true, muted: false});
+    setTimeout(function () {
+        that.audio = attachMediaStream(that.audio, that.stream, {
+            autoplay: true,
+            muted: false
+        });
     }, 1000);
 
     return that;
