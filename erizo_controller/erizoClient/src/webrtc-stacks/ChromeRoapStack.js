@@ -12,11 +12,15 @@ Erizo.ChromeRoapStack = function (spec) {
         "iceServers": []
     };
 
+    if (spec.turnOnly) {
+        that.pc_config.iceTransports = "relay";
+    }
+
     that.con = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
 
     if (spec.stunServerUrl !== undefined) {
         that.pc_config.iceServers.push({"url": spec.stunServerUrl});
-    } 
+    }
 
     // if ((spec.turnServer || {}).url) {
     //     that.pc_config.iceServers.push({"username": spec.turnServer.username, "credential": spec.turnServer.password, "url": spec.turnServer.url});
@@ -240,7 +244,7 @@ Erizo.ChromeRoapStack = function (spec) {
         if (that.actionNeeded) {
             if (that.state === 'new' || that.state === 'established') {
                 // See if the current offer is the same as what we already sent.
-                // If not, no change is needed.   
+                // If not, no change is needed.
 
                 that.peerConnection.createOffer(function (sessionDescription) {
 
@@ -382,7 +386,7 @@ Erizo.ChromeRoapStack = function (spec) {
     that.peerConnection.oniceconnectionstatechange = function (e) {
         if (that.oniceconnectionstatechange) {
             that.oniceconnectionstatechange(e.currentTarget.iceConnectionState);
-        }   
+        }
     };
 
     // Variables that are part of the public interface of PeerConnection

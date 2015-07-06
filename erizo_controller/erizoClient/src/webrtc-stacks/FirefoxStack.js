@@ -16,9 +16,13 @@ Erizo.FirefoxStack = function (spec) {
         "iceServers": []
     };
 
+    if (spec.turnOnly) {
+        that.pc_config.iceTransports = "relay";
+    }
+
     if (spec.stunServerUrl !== undefined) {
         that.pc_config.iceServers.push({"url": spec.stunServerUrl});
-    } 
+    }
 
     // if ((spec.turnServer || {}).url) {
     //     that.pc_config.iceServers.push({"username": spec.turnServer.username, "credential": spec.turnServer.password, "url": spec.turnServer.url});
