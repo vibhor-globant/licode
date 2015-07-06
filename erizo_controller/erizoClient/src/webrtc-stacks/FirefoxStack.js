@@ -16,9 +16,13 @@ Erizo.FirefoxStack = function (spec) {
         "iceServers": []
     };
 
+    if (spec.turnOnly) {
+        that.pc_config.iceTransports = "relay";
+    }
+
     if (spec.stunServerUrl !== undefined) {
         that.pc_config.iceServers.push({"url": spec.stunServerUrl});
-    } 
+    }
 
     // if ((spec.turnServer || {}).url) {
     //     that.pc_config.iceServers.push({"username": spec.turnServer.username, "credential": spec.turnServer.password, "url": spec.turnServer.url});
@@ -142,11 +146,20 @@ Erizo.FirefoxStack = function (spec) {
         that.peerConnection.setLocalDescription(localDesc);
     }
 
+<<<<<<< Updated upstream
     that.createOffer = function () {
         that.peerConnection.createOffer(setLocalDesc, function(error){
           L.Logger.error("Error", error);
         
         }, that.mediaConstraints);
+=======
+    that.createOffer = function (isSubscribe) {
+        if (isSubscribe === true) {
+            that.peerConnection.createOffer(setLocalDesc, errorCallback, that.mediaConstraints);
+        } else {
+            that.peerConnection.createOffer(setLocalDesc, errorCallback);
+        }
+>>>>>>> Stashed changes
     };
 
     that.addStream = function (stream) {
@@ -164,8 +177,13 @@ Erizo.FirefoxStack = function (spec) {
     };
 
     that.processSignalingMessage = function (msg) {
+<<<<<<< Updated upstream
         
         //console.log("Process Signaling Message", msg);
+=======
+
+//        L.Logger.debug("Process Signaling Message", msg);
+>>>>>>> Stashed changes
 
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
@@ -209,7 +227,7 @@ Erizo.FirefoxStack = function (spec) {
             });
 
         } else if (msg.type === 'candidate') {
-          
+
             try {
                 var obj;
                 if (typeof(msg.candidate) === 'object') {
@@ -219,6 +237,10 @@ Erizo.FirefoxStack = function (spec) {
                 }
                 obj.candidate = obj.candidate.replace(/ generation 0/g, "");
                 obj.candidate = obj.candidate.replace(/ udp /g, " UDP ");
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
                 obj.sdpMLineIndex = parseInt(obj.sdpMLineIndex);
                 var candidate = new RTCIceCandidate(obj);
                 //console.log("Remote Candidate",candidate);

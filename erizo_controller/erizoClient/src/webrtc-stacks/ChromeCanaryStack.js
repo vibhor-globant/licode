@@ -12,6 +12,10 @@ Erizo.ChromeCanaryStack = function (spec) {
         "iceServers": []
     };
 
+    if (spec.turnOnly) {
+        that.pc_config.iceTransports = "relay";
+    }
+
     that.con = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
 
     if (spec.stunServerUrl !== undefined) {
@@ -382,7 +386,7 @@ Erizo.ChromeCanaryStack = function (spec) {
     that.peerConnection.oniceconnectionstatechange = function (e) {
         if (that.oniceconnectionstatechange) {
             that.oniceconnectionstatechange(e.currentTarget.iceConnectionState);
-        }   
+        }
     };
 
     // Variables that are part of the public interface of PeerConnection
