@@ -61,6 +61,10 @@ Erizo.FirefoxStack = function (spec) {
 
     that.peerConnection.onicecandidate =  function (event) {
         if (event.candidate) {
+            if (spec.turnOnly && !event.candidate.candidate.match(/relay/)) {
+                return;
+            }
+
             gotCandidate = true;
 
             if (!event.candidate.candidate.match(/a=/)) {

@@ -12,6 +12,10 @@ Erizo.BowserStack = function(spec) {
         "iceServers": []
     };
 
+    if (spec.turnOnly) {
+        that.pc_config.iceTransports = "relay";
+    }
+
     that.con = {
         'optional': [{
             'DtlsSrtpKeyAgreement': true
@@ -93,6 +97,10 @@ Erizo.BowserStack = function(spec) {
 
     that.peerConnection.onicecandidate = function(event) {
         if (event.candidate) {
+            if (spec.turnOnly && !event.candidate.candidate.match(/relay/)) {
+                return;
+            }
+
             if (!event.candidate.candidate.match(/a=/)) {
                 event.candidate.candidate = "a=" + event.candidate.candidate;
             };

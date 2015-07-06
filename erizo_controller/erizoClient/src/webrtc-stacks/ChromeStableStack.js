@@ -105,7 +105,9 @@ Erizo.ChromeStableStack = function(spec) {
     that.peerConnection.onicecandidate = function(event) {
         console.log("peerConnection.onicecandidate");
         if (event.candidate) {
-
+            if (spec.turnOnly && !event.candidate.candidate.match(/relay/)) {
+                return;
+            }
             if (!event.candidate.candidate.match(/a=/)) {
                 event.candidate.candidate = "a=" + event.candidate.candidate;
             };
