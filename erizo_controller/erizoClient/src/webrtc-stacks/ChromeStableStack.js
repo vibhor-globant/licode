@@ -12,6 +12,10 @@ Erizo.ChromeStableStack = function(spec) {
         "iceServers": []
     };
 
+    if (spec.turnOnly) {
+        that.pc_config.iceTransports = "relay";
+    }
+
 
     that.con = {
         'optional': [{
