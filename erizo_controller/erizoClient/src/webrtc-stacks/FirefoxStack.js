@@ -95,6 +95,14 @@ Erizo.FirefoxStack = function (spec) {
         }
     };
 
+    that.peerConnection.oniceconnectionstatechange = function(evt) {
+        console.log("peerConnection.oniceconnectionstatechange state = " + that.peerConnection.iceConnectionState);
+        if (spec.pcUpdate) {
+            spec.pcUpdate("oniceconnectionstatechange", {iceConnectionState: that.peerConnection.iceConnectionState});
+        }
+    };
+
+
 
     var setMaxBW = function (sdp) {
         if (spec.video && spec.maxVideoBW) {

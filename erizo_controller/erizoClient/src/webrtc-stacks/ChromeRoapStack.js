@@ -387,6 +387,9 @@ Erizo.ChromeRoapStack = function (spec) {
         if (that.oniceconnectionstatechange) {
             that.oniceconnectionstatechange(e.currentTarget.iceConnectionState);
         }
+        if (spec.pcUpdate) {
+            spec.pcUpdate("oniceconnectionstatechange", {iceConnectionState: e.currentTarget.iceConnectionState});
+        }
     };
 
     // Variables that are part of the public interface of PeerConnection
