@@ -155,7 +155,7 @@ Erizo.Room = function (spec) {
 
             myStream.pc[arg.peerSocket] = Erizo.Connection({callback: function (msg) {
                 sendSDPSocket('signaling_message', {streamId: arg.streamId, peerSocket: arg.peerSocket, msg: msg});
-            }, audio: myStream.hasAudio(), video: myStream.hasVideo(), stunServerUrl: that.stunServerUrl, turnServers: that.turnServers, turnOnly: spec.turnOnly});
+            }, audio: myStream.hasAudio(), video: myStream.hasVideo(), stunServerUrl: that.stunServerUrl, turnServers: that.turnServers, turnOnly: spec.turnOnly, pcUpdate: spec.pcUpdate});
 
 
             myStream.pc[arg.peerSocket].oniceconnectionstatechange = function (state) {

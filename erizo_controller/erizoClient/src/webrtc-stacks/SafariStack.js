@@ -155,6 +155,9 @@ Erizo.SafariStack = function(spec) {
 
     that.peerConnection.oniceconnectionstatechange = function(evt) {
         console.log("peerConnection.oniceconnectionstatechange state = " + that.peerConnection.iceConnectionState);
+        if (spec.pcUpdate) {
+            spec.pcUpdate("oniceconnectionstatechange", {iceConnectionState: that.peerConnection.iceConnectionState});
+        }
     };
 
     that.peerConnection.onsignalingstatechange = function(evt) {
