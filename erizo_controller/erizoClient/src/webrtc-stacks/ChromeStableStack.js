@@ -125,7 +125,7 @@ Erizo.ChromeStableStack = function(spec) {
                 });
             } else {
                 spec.localCandidates.push(candidateObject);
-                console.log("Local Candidates stored: ", spec.localCandidates.length, spec.localCandidates);
+                L.Logger.info("Storing candidate: ", spec.localCandidates.length, candidateObject);
             }
 
         } else {
@@ -180,7 +180,6 @@ Erizo.ChromeStableStack = function(spec) {
     var setLocalDescp2p = function(sessionDescription) {
         console.log("setLocalDescp2p");
         sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
-        sessionDescription.sdp = sessionDescription.sdp.replace(/a=ice-options:google-ice\r\n/g, "");
         spec.callback({
             type: sessionDescription.type,
             sdp: sessionDescription.sdp
@@ -194,27 +193,27 @@ Erizo.ChromeStableStack = function(spec) {
         });
     }
 
-    that.updateSpec = function (config, callback){
-        if (config.maxVideoBW || config.maxAudioBW ){
-            if (config.maxVideoBW){
-                console.log ("Maxvideo Requested", config.maxVideoBW, "limit", spec.limitMaxVideoBW);
+    that.updateSpec = function (config, callback) {
+        if (config.maxVideoBW || config.maxAudioBW) {
+            if (config.maxVideoBW) {
+                console.log("Maxvideo Requested", config.maxVideoBW, "limit", spec.limitMaxVideoBW);
                 if (config.maxVideoBW > spec.limitMaxVideoBW) {
                     config.maxVideoBW = spec.limitMaxVideoBW;
                 }
-                spec.maxVideoBW = config.maxVideoBW; 
-                console.log ("Result", spec.maxVideoBW);
+                spec.maxVideoBW = config.maxVideoBW;
+                console.log("Result", spec.maxVideoBW);
             }
-            if (config.maxAudioBW){
+            if (config.maxAudioBW) {
                 if (config.maxAudioBW > spec.limitMaxAudioBW) {
                     config.maxAudioBW = spec.limitMaxAudioBW;
                 }
-                spec.maxAudioBW = config.maxAudioBW; 
+                spec.maxAudioBW = config.maxAudioBW;
             }
 
             localDesc.sdp = setMaxBW(localDesc.sdp);
-            that.peerConnection.setLocalDescription(localDesc, function(){
+            that.peerConnection.setLocalDescription(localDesc, function () {
                 remoteDesc.sdp = setMaxBW(remoteDesc.sdp);
-                that.peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDesc), function() {
+                that.peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDesc), function () {
                     spec.remoteDescriptionSet = true;
                     if (callback)
                         callback("success");
@@ -222,7 +221,7 @@ Erizo.ChromeStableStack = function(spec) {
                 });
             });
         }
-        
+
     };
 
     that.createOffer = function (isSubscribe) {
@@ -241,22 +240,20 @@ Erizo.ChromeStableStack = function(spec) {
 
     spec.remoteDescriptionSet = false;
 
-    that.processSignalingMessage = function(msg) {
-        //console.log("Process Signaling Message", msg);
+    that.processSignalingMessage = function (msg) {
+        //L.Logger.info("Process Signaling Message", msg);
 
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
-            console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
-            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
-                console.log("processSignalingMessage: peerConnection.setRemoteDescription successful");
-                console.log("processSignalingMessage: calling peerConnection.createAnswer");
-                that.peerConnection.createAnswer(setLocalDescp2p, function(err) {
-                    console.log("processSignalingMessage: peerConnection.createAnswer error = " + err);
+            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
+                that.peerConnection.createAnswer(setLocalDescp2p, function (error) {
+                    L.Logger.error("Error: ", error);
                 }, that.mediaConstraints);
                 spec.remoteDescriptionSet = true;
-            }, function(err) {
-                console.log("Set remote description failed with error: " + err + ", msg = " + JSON.stringify(msg));
+            }, function (error) {
+                L.Logger.error("Error setting Remote Description", error)
             });
+
 
         } else if (msg.type === 'answer') {
 
@@ -272,21 +269,21 @@ Erizo.ChromeStableStack = function(spec) {
             msg.sdp = setMaxBW(msg.sdp);
 
             remoteDesc = msg;
-            that.peerConnection.setLocalDescription(localDesc, function(){
-              that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
-                spec.remoteDescriptionSet = true;
-                console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
-                while (spec.remoteCandidates.length > 0) {
-                // IMPORTANT: preserve ordering of candidates
-                  that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
-                }
-                console.log("Local candidates to send:" , spec.localCandidates.length);
-                while(spec.localCandidates.length > 0) {
-                // IMPORTANT: preserve ordering of candidates
-                  spec.callback({type:'candidate', candidate: spec.localCandidates.shift()});
-                }
+            that.peerConnection.setLocalDescription(localDesc, function () {
+                that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
+                    spec.remoteDescriptionSet = true;
+                    console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
+                    while (spec.remoteCandidates.length > 0) {
+                        // IMPORTANT: preserve ordering of candidates
+                        that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
+                    }
+                    console.log("Local candidates to send:", spec.localCandidates.length);
+                    while (spec.localCandidates.length > 0) {
+                        // IMPORTANT: preserve ordering of candidates
+                        spec.callback({type: 'candidate', candidate: spec.localCandidates.shift()});
+                    }
 
-              });
+                });
             });
 
         } else if (msg.type === 'candidate') {
