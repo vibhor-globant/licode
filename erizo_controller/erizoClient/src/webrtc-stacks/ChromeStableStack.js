@@ -240,22 +240,20 @@ Erizo.ChromeStableStack = function(spec) {
 
     spec.remoteDescriptionSet = false;
 
-    that.processSignalingMessage = function(msg) {
-        //console.log("Process Signaling Message", msg);
+    that.processSignalingMessage = function (msg) {
+        //L.Logger.info("Process Signaling Message", msg);
 
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
-            console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
-            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
-                console.log("processSignalingMessage: peerConnection.setRemoteDescription successful");
-                console.log("processSignalingMessage: calling peerConnection.createAnswer");
-                that.peerConnection.createAnswer(setLocalDescp2p, function(err) {
-                    console.log("processSignalingMessage: peerConnection.createAnswer error = " + err);
+            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
+                that.peerConnection.createAnswer(setLocalDescp2p, function (error) {
+                    L.Logger.error("Error: ", error);
                 }, that.mediaConstraints);
                 spec.remoteDescriptionSet = true;
-            }, function(err) {
-                console.log("Set remote description failed with error: " + err + ", msg = " + JSON.stringify(msg));
+            }, function (error) {
+                L.Logger.error("Error setting Remote Description", error)
             });
+
 
         } else if (msg.type === 'answer') {
 

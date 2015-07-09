@@ -64,7 +64,6 @@ Erizo.FirefoxStack = function (spec) {
             if (spec.turnOnly && !event.candidate.candidate.match(/relay/)) {
                 return;
             }
-
             gotCandidate = true;
 
             if (!event.candidate.candidate.match(/a=/)) {
@@ -148,7 +147,7 @@ Erizo.FirefoxStack = function (spec) {
     }
 
     that.createOffer = function (isSubscribe) {
-        if (isSubscribe === true) {            
+        if (isSubscribe === true) {
             that.peerConnection.createOffer(setLocalDesc, errorCallback, that.mediaConstraints);
         } else {
             that.peerConnection.createOffer(setLocalDesc, errorCallback);
