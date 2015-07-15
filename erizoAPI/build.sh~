@@ -5,5 +5,5 @@ if hash node-waf 2>/dev/null; then
   node-waf configure build
 else
   echo 'building with node-gyp'
-  node-gyp --target=0.10.37 rebuild
+  node-gyp rebuild
 fi
