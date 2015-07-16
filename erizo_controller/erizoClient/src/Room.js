@@ -784,7 +784,7 @@ Erizo.Room = function (spec) {
     };
 
     that.getStats = function (callback) {
-        var stream, pc, result = {
+        var stream, result = {
                 local: {},
                 remote: {}
             },
@@ -808,7 +808,7 @@ Erizo.Room = function (spec) {
                 for (var jj in stream.pc) {
                     if (stream.pc.hasOwnProperty(jj)) {
                         result.local[streamId][jj] = {};
-                        pc = stream.pc[jj];
+                        var pc = stream.pc[jj];
                         if ((typeof pc.getStats !== "undefined") && pc.getStats) {
                             promises.push(_getStats(streamId, jj, pc));
                         }
@@ -827,7 +827,7 @@ Erizo.Room = function (spec) {
                 for (var jj in stream.pc) {
                     if (stream.pc.hasOwnProperty(jj)) {
                         result.local[streamId][jj] = {};
-                        pc = stream.pc[jj];
+                        var pc = stream.pc[jj];
                         if ((typeof pc.getStats !== "undefined") && pc.getStats) {
                             promises.push(_getStats(streamId, jj, pc));
                         }
