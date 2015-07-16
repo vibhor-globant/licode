@@ -816,6 +816,26 @@ Erizo.Room = function (spec) {
                 }
             }
         }
+
+        for (var index in that.remoteStreams) {
+            if (that.remoteStreams.hasOwnProperty(index)) {
+                stream = that.remoteStreams[index];
+                var streamId = stream.getID();
+                if (!result.local[streamId]) {
+                    result.local[streamId] = {};
+                }
+                for (var jj in stream.pc) {
+                    if (stream.pc.hasOwnProperty(jj)) {
+                        result.local[streamId][jj] = {};
+                        pc = stream.pc[jj];
+                        if ((typeof pc.getStats !== "undefined") && pc.getStats) {
+                            promises.push(_getStats(streamId, jj, pc));
+                        }
+                    }
+                }
+            }
+        }
+
         Promise.all(promises).then(function (res) {
             callback(res);
         });
