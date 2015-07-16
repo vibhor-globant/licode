@@ -1,6 +1,7 @@
 #!/bin/bash
 FILE=../dist/erizo.js
 rm $FILE
+cat ../lib/promise-7.0.1.js >> $FILE
 cat ../lib/socket.io.js >> $FILE
 cat ../lib/adapter.debug.js >> $FILE
 cat ../src/Events.js >> $FILE
