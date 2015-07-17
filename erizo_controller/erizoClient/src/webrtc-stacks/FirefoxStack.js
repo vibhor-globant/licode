@@ -405,7 +405,9 @@ Erizo.FirefoxStack = function (spec) {
             });
         });
 
-        return new Promise.all(promises);
+        return new Promise.all(promises).then(function(res) {
+            return res;
+        });
     };
     return that;
 };
