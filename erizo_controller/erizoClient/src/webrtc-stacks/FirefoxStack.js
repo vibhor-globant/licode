@@ -1,4 +1,4 @@
-/*global window, console, RTCSessionDescription, RoapConnection, webkitRTCPeerConnection*/
+/*global window, console, RTCSessionDescription, RoapConnection, webkitRTCPeerConnection, Promise*/
 
 var Erizo = Erizo || {};
 
@@ -21,14 +21,16 @@ Erizo.FirefoxStack = function (spec) {
     }
 
     if (spec.stunServerUrl !== undefined) {
-        that.pc_config.iceServers.push({"url": spec.stunServerUrl});
+        that.pc_config.iceServers.push({
+            "url": spec.stunServerUrl
+        });
     }
 
     // if ((spec.turnServer || {}).url) {
     //     that.pc_config.iceServers.push({"username": spec.turnServer.username, "credential": spec.turnServer.password, "url": spec.turnServer.url});
     // }
 
-    (spec.turnServers || []).forEach(function(turnServer) {
+    (spec.turnServers || []).forEach(function (turnServer) {
         if (turnServer.url) {
             that.pc_config.iceServers.push({
                 username: turnServer.username,
@@ -59,7 +61,7 @@ Erizo.FirefoxStack = function (spec) {
     that.peerConnection = new WebkitRTCPeerConnection(that.pc_config, that.con);
     spec.localCandidates = [];
 
-    that.peerConnection.onicecandidate =  function (event) {
+    that.peerConnection.onicecandidate = function (event) {
         if (event.candidate) {
             if (spec.turnOnly && !event.candidate.candidate.match(/relay/)) {
                 return;
@@ -67,11 +69,14 @@ Erizo.FirefoxStack = function (spec) {
             gotCandidate = true;
 
             if (!event.candidate.candidate.match(/a=/)) {
-                event.candidate.candidate ="a="+event.candidate.candidate;
+                event.candidate.candidate = "a=" + event.candidate.candidate;
             };
 
             if (spec.remoteDescriptionSet) {
-                spec.callback({type:'candidate', candidate: event.candidate});
+                spec.callback({
+                    type: 'candidate',
+                    candidate: event.candidate
+                });
             } else {
                 spec.localCandidates.push(event.candidate);
                 console.log("Local Candidates stored: ", spec.localCandidates.length, spec.localCandidates);
@@ -94,10 +99,12 @@ Erizo.FirefoxStack = function (spec) {
         }
     };
 
-    that.peerConnection.oniceconnectionstatechange = function(evt) {
+    that.peerConnection.oniceconnectionstatechange = function (evt) {
         console.log("peerConnection.oniceconnectionstatechange state = " + that.peerConnection.iceConnectionState);
         if (spec.pcUpdate) {
-            spec.pcUpdate("oniceconnectionstatechange", {iceConnectionState: that.peerConnection.iceConnectionState});
+            spec.pcUpdate("oniceconnectionstatechange", {
+                iceConnectionState: that.peerConnection.iceConnectionState
+            });
         }
     };
 
@@ -106,8 +113,8 @@ Erizo.FirefoxStack = function (spec) {
     var setMaxBW = function (sdp) {
         if (spec.video && spec.maxVideoBW) {
             var a = sdp.match(/m=video.*\r\n/);
-            if (a == null){
-              a = sdp.match(/m=video.*\n/);
+            if (a == null) {
+                a = sdp.match(/m=video.*\n/);
             }
             if (a && (a.length > 0)) {
                 var r = a[0] + "b=AS:" + spec.maxVideoBW + "\r\n";
@@ -117,8 +124,8 @@ Erizo.FirefoxStack = function (spec) {
 
         if (spec.audio && spec.maxAudioBW) {
             var a = sdp.match(/m=audio.*\r\n/);
-            if (a == null){
-              a = sdp.match(/m=audio.*\n/);
+            if (a == null) {
+                a = sdp.match(/m=audio.*\n/);
             }
             if (a && (a.length > 0)) {
                 var r = a[0] + "b=AS:" + spec.maxAudioBW + "\r\n";
@@ -169,18 +176,18 @@ Erizo.FirefoxStack = function (spec) {
     };
 
     that.processSignalingMessage = function (msg) {
-        
-//        L.Logger.debug("Process Signaling Message", msg);
+
+        //        L.Logger.debug("Process Signaling Message", msg);
 
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
-            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function(){
-                that.peerConnection.createAnswer(setLocalDescp2p, function(error){
-                L.Logger.error("Error", error);
-            }, that.mediaConstraints);
+            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
+                that.peerConnection.createAnswer(setLocalDescp2p, function (error) {
+                    L.Logger.error("Error", error);
+                }, that.mediaConstraints);
                 spec.remoteDescriptionSet = true;
-            }, function(error){
-              L.Logger.error("Error setting Remote Description", error)
+            }, function (error) {
+                L.Logger.error("Error setting Remote Description", error)
             });
         } else if (msg.type === 'answer') {
 
@@ -194,57 +201,211 @@ Erizo.FirefoxStack = function (spec) {
 
             msg.sdp = setMaxBW(msg.sdp);
 
-            that.peerConnection.setLocalDescription(localDesc, function(){
-                that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
+            that.peerConnection.setLocalDescription(localDesc, function () {
+                that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
                     spec.remoteDescriptionSet = true;
                     L.Logger.info("Remote Description successfully set");
                     while (spec.remoteCandidates.length > 0 && gotCandidate) {
                         L.Logger.info("Setting stored remote candidates")
-                        // IMPORTANT: preserve ordering of candidates
+                            // IMPORTANT: preserve ordering of candidates
                         that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
                     }
-                    while(spec.localCandidates.length > 0) {
+                    while (spec.localCandidates.length > 0) {
                         L.Logger.info("Sending Candidate from list");
                         // IMPORTANT: preserve ordering of candidates
-                        spec.callback({type:'candidate', candidate: spec.localCandidates.shift()});
+                        spec.callback({
+                            type: 'candidate',
+                            candidate: spec.localCandidates.shift()
+                        });
                     }
-                }, function (error){
+                }, function (error) {
                     L.Logger.error("Error Setting Remote Description", error);
                 });
-            },function(error){
-               L.Logger.error("Failure setting Local Description", error);
+            }, function (error) {
+                L.Logger.error("Failure setting Local Description", error);
             });
 
         } else if (msg.type === 'candidate') {
           
             try {
                 var obj;
-                if (typeof(msg.candidate) === 'object') {
+                if (typeof (msg.candidate) === 'object') {
                     obj = msg.candidate;
                 } else {
                     obj = JSON.parse(msg.candidate);
                 }
                 obj.candidate = obj.candidate.replace(/ generation 0/g, "");
                 obj.candidate = obj.candidate.replace(/ udp /g, " UDP ");
-               
+
                 obj.sdpMLineIndex = parseInt(obj.sdpMLineIndex);
                 var candidate = new RTCIceCandidate(obj);
-//                L.logger.debug("Remote Candidate",candidate);
+                //                L.logger.debug("Remote Candidate",candidate);
 
                 if (spec.remoteDescriptionSet && gotCandidate) {
                     that.peerConnection.addIceCandidate(candidate);
                     while (spec.remoteCandidates.length > 0) {
                         L.Logger.info("Setting stored remote candidates")
-                        // IMPORTANT: preserve ordering of candidates
+                            // IMPORTANT: preserve ordering of candidates
                         that.peerConnection.addIceCandidate(spec.remoteCandidates.shift());
                     }
                 } else {
                     spec.remoteCandidates.push(candidate);
                 }
-            } catch(e) {
+            } catch (e) {
                 L.Logger.error("Error parsing candidate", msg.candidate, e);
             }
         }
     }
+
+    that.getStats = function () {
+        var promises = [];
+
+        var createPromise = function (track) {
+            return new Promise(function (fulfill) {
+                var globalObject = {
+                        audio: {},
+                        video: {}
+                    },
+                    merge = function merge(mergein, mergeto) {
+                        if (!mergein) {
+                            mergein = {};
+                        }
+                        if (!mergeto) {
+                            return mergein;
+                        }
+
+                        for (var item in mergeto) {
+                            mergein[item] = mergeto[item];
+                        }
+                        return mergein;
+                    },
+                    reformat = function (results) {
+                        var result = {
+                            audio: {},
+                            video: {},
+                            results: results,
+                        };
+                        var bytes = null,
+                            kilobytes = null;
+
+                        for (var i = 0; i < results.length; ++i) {
+                            var res = results[i];
+
+                            if (res.googCodecName == 'opus' && res.bytesSent) {
+                                if (!globalObject.audio.prevBytesSent) {
+                                    globalObject.audio.prevBytesSent = res.bytesSent;
+                                }
+
+                                bytes = res.bytesSent - globalObject.audio.prevBytesSent;
+                                globalObject.audio.prevBytesSent = res.bytesSent;
+
+                                kilobytes = bytes / 1024;
+
+                                result.audio = merge(result.audio, {
+                                    availableBandwidth: kilobytes.toFixed(1),
+                                    inputLevel: res.audioInputLevel,
+                                    packetsLost: res.packetsLost,
+                                    rtt: res.googRtt,
+                                    packetsSent: res.packetsSent,
+                                    bytesSent: res.bytesSent
+                                });
+                            }
+
+                            if (res.googCodecName == 'VP8') {
+                                if (!globalObject.video.prevBytesSent) {
+                                    globalObject.video.prevBytesSent = res.bytesSent;
+                                }
+
+                                bytes = res.bytesSent - globalObject.video.prevBytesSent;
+                                globalObject.video.prevBytesSent = res.bytesSent;
+
+                                kilobytes = bytes / 1024;
+
+                                result.video = merge(result.video, {
+                                    availableBandwidth: kilobytes.toFixed(1),
+                                    googFrameHeightInput: res.googFrameHeightInput,
+                                    googFrameWidthInput: res.googFrameWidthInput,
+                                    googCaptureQueueDelayMsPerS: res.googCaptureQueueDelayMsPerS,
+                                    rtt: res.googRtt,
+                                    packetsLost: res.packetsLost,
+                                    packetsSent: res.packetsSent,
+                                    googEncodeUsagePercent: res.googEncodeUsagePercent,
+                                    googCpuLimitedResolution: res.googCpuLimitedResolution,
+                                    googNacksReceived: res.googNacksReceived,
+                                    googFrameRateInput: res.googFrameRateInput,
+                                    googPlisReceived: res.googPlisReceived,
+                                    googViewLimitedResolution: res.googViewLimitedResolution,
+                                    googCaptureJitterMs: res.googCaptureJitterMs,
+                                    googAvgEncodeMs: res.googAvgEncodeMs,
+                                    googFrameHeightSent: res.googFrameHeightSent,
+                                    googFrameRateSent: res.googFrameRateSent,
+                                    googBandwidthLimitedResolution: res.googBandwidthLimitedResolution,
+                                    googFrameWidthSent: res.googFrameWidthSent,
+                                    googFirsReceived: res.googFirsReceived,
+                                    bytesSent: res.bytesSent
+                                });
+                            }
+
+                            if (res.type == 'VideoBwe') {
+                                result.video.bandwidth = {
+                                    googActualEncBitrate: res.googActualEncBitrate,
+                                    googAvailableSendBandwidth: res.googAvailableSendBandwidth,
+                                    googAvailableReceiveBandwidth: res.googAvailableReceiveBandwidth,
+                                    googRetransmitBitrate: res.googRetransmitBitrate,
+                                    googTargetEncBitrate: res.googTargetEncBitrate,
+                                    googBucketDelay: res.googBucketDelay,
+                                    googTransmitBitrate: res.googTransmitBitrate
+                                };
+                            }
+
+                            // res.googActiveConnection means either STUN or TURN is used.
+
+                            if (res.type == 'googCandidatePair' && res.googActiveConnection == 'true') {
+                                result.connectionType = {
+                                    local: {
+                                        candidateType: res.googLocalCandidateType,
+                                        ipAddress: res.googLocalAddress
+                                    },
+                                    remote: {
+                                        candidateType: res.googRemoteCandidateType,
+                                        ipAddress: res.googRemoteAddress
+                                    },
+                                    transport: res.googTransportType
+                                };
+                            }
+                        }
+
+                        fulfill(result);
+                    };
+
+                that.peerConnection.getStats(track, function (res) {
+                    var items = [];
+                    res.forEach(function (result) {
+                        items.push(result);
+                    });
+                    reformat(items);
+                }, reformat);
+            });
+        };
+        that.peerConnection.getLocalStreams().forEach(function (stream) {
+            stream.getAudioTracks().forEach(function (track) {
+                promises.push(createPromise(track));
+            });
+            stream.getVideoTracks().forEach(function (track) {
+                promises.push(createPromise(track));
+            });
+        });
+
+        that.peerConnection.getRemoteStreams().forEach(function (stream) {
+            stream.getAudioTracks().forEach(function (track) {
+                promises.push(createPromise(track));
+            });
+            stream.getVideoTracks().forEach(function (track) {
+                promises.push(createPromise(track));
+            });
+        });
+
+        return new Promise.all(promises);
+    };
     return that;
 };

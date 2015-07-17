@@ -1,4 +1,4 @@
-/*global window, console, RTCSessionDescription, RoapConnection, webkitRTCPeerConnection*/
+/*global window, console, RTCSessionDescription, RoapConnection, webkitRTCPeerConnection, Promise*/
 
 var Erizo = Erizo || {};
 
@@ -316,7 +316,7 @@ Erizo.ChromeStableStack = function (spec) {
     }
 
     that.getStats = function () {
-        return new Promise(function (fulfill, reject) {
+        return new Promise(function (fulfill) {
             var globalObject = {
                     audio: {},
                     video: {}
