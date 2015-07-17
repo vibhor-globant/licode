@@ -258,155 +258,130 @@ Erizo.FirefoxStack = function (spec) {
     }
 
     that.getStats = function () {
-        var promises = [];
-
-        var createPromise = function (track) {
-            return new Promise(function (fulfill) {
-                var globalObject = {
-                        audio: {},
-                        video: {}
-                    },
-                    merge = function merge(mergein, mergeto) {
-                        if (!mergein) {
-                            mergein = {};
-                        }
-                        if (!mergeto) {
-                            return mergein;
-                        }
-
-                        for (var item in mergeto) {
-                            mergein[item] = mergeto[item];
-                        }
+        return new Promise(function (fulfill) {
+            var globalObject = {
+                    audio: {},
+                    video: {}
+                },
+                merge = function merge(mergein, mergeto) {
+                    if (!mergein) {
+                        mergein = {};
+                    }
+                    if (!mergeto) {
                         return mergein;
-                    },
-                    reformat = function (results) {
-                        var result = {
-                            audio: {},
-                            video: {},
-                            results: results,
-                        };
-                        var bytes = null,
-                            kilobytes = null;
+                    }
 
-                        for (var i = 0; i < results.length; ++i) {
-                            var res = results[i];
+                    for (var item in mergeto) {
+                        mergein[item] = mergeto[item];
+                    }
+                    return mergein;
+                },
+                reformat = function (results) {
+                    var result = {
+                        audio: {},
+                        video: {},
+                        results: results,
+                    };
+                    var bytes = null,
+                        kilobytes = null;
 
-                            if (res.googCodecName == 'opus' && res.bytesSent) {
-                                if (!globalObject.audio.prevBytesSent) {
-                                    globalObject.audio.prevBytesSent = res.bytesSent;
-                                }
+                    for (var i = 0; i < results.length; ++i) {
+                        var res = results[i];
 
-                                bytes = res.bytesSent - globalObject.audio.prevBytesSent;
+                        if (res.googCodecName == 'opus' && res.bytesSent) {
+                            if (!globalObject.audio.prevBytesSent) {
                                 globalObject.audio.prevBytesSent = res.bytesSent;
-
-                                kilobytes = bytes / 1024;
-
-                                result.audio = merge(result.audio, {
-                                    availableBandwidth: kilobytes.toFixed(1),
-                                    inputLevel: res.audioInputLevel,
-                                    packetsLost: res.packetsLost,
-                                    rtt: res.googRtt,
-                                    packetsSent: res.packetsSent,
-                                    bytesSent: res.bytesSent
-                                });
                             }
 
-                            if (res.googCodecName == 'VP8') {
-                                if (!globalObject.video.prevBytesSent) {
-                                    globalObject.video.prevBytesSent = res.bytesSent;
-                                }
+                            bytes = res.bytesSent - globalObject.audio.prevBytesSent;
+                            globalObject.audio.prevBytesSent = res.bytesSent;
 
-                                bytes = res.bytesSent - globalObject.video.prevBytesSent;
-                                globalObject.video.prevBytesSent = res.bytesSent;
+                            kilobytes = bytes / 1024;
 
-                                kilobytes = bytes / 1024;
-
-                                result.video = merge(result.video, {
-                                    availableBandwidth: kilobytes.toFixed(1),
-                                    googFrameHeightInput: res.googFrameHeightInput,
-                                    googFrameWidthInput: res.googFrameWidthInput,
-                                    googCaptureQueueDelayMsPerS: res.googCaptureQueueDelayMsPerS,
-                                    rtt: res.googRtt,
-                                    packetsLost: res.packetsLost,
-                                    packetsSent: res.packetsSent,
-                                    googEncodeUsagePercent: res.googEncodeUsagePercent,
-                                    googCpuLimitedResolution: res.googCpuLimitedResolution,
-                                    googNacksReceived: res.googNacksReceived,
-                                    googFrameRateInput: res.googFrameRateInput,
-                                    googPlisReceived: res.googPlisReceived,
-                                    googViewLimitedResolution: res.googViewLimitedResolution,
-                                    googCaptureJitterMs: res.googCaptureJitterMs,
-                                    googAvgEncodeMs: res.googAvgEncodeMs,
-                                    googFrameHeightSent: res.googFrameHeightSent,
-                                    googFrameRateSent: res.googFrameRateSent,
-                                    googBandwidthLimitedResolution: res.googBandwidthLimitedResolution,
-                                    googFrameWidthSent: res.googFrameWidthSent,
-                                    googFirsReceived: res.googFirsReceived,
-                                    bytesSent: res.bytesSent
-                                });
-                            }
-
-                            if (res.type == 'VideoBwe') {
-                                result.video.bandwidth = {
-                                    googActualEncBitrate: res.googActualEncBitrate,
-                                    googAvailableSendBandwidth: res.googAvailableSendBandwidth,
-                                    googAvailableReceiveBandwidth: res.googAvailableReceiveBandwidth,
-                                    googRetransmitBitrate: res.googRetransmitBitrate,
-                                    googTargetEncBitrate: res.googTargetEncBitrate,
-                                    googBucketDelay: res.googBucketDelay,
-                                    googTransmitBitrate: res.googTransmitBitrate
-                                };
-                            }
-
-                            // res.googActiveConnection means either STUN or TURN is used.
-
-                            if (res.type == 'googCandidatePair' && res.googActiveConnection == 'true') {
-                                result.connectionType = {
-                                    local: {
-                                        candidateType: res.googLocalCandidateType,
-                                        ipAddress: res.googLocalAddress
-                                    },
-                                    remote: {
-                                        candidateType: res.googRemoteCandidateType,
-                                        ipAddress: res.googRemoteAddress
-                                    },
-                                    transport: res.googTransportType
-                                };
-                            }
+                            result.audio = merge(result.audio, {
+                                availableBandwidth: kilobytes.toFixed(1),
+                                inputLevel: res.audioInputLevel,
+                                packetsLost: res.packetsLost,
+                                rtt: res.googRtt,
+                                packetsSent: res.packetsSent,
+                                bytesSent: res.bytesSent
+                            });
                         }
 
-                        fulfill(result);
-                    };
+                        if (res.googCodecName == 'VP8') {
+                            if (!globalObject.video.prevBytesSent) {
+                                globalObject.video.prevBytesSent = res.bytesSent;
+                            }
 
-                that.peerConnection.getStats(track, function (res) {
-                    var items = [];
-                    res.forEach(function (result) {
-                        items.push(result);
-                    });
-                    reformat(items);
-                }, reformat);
-            });
-        };
-        that.peerConnection.getLocalStreams().forEach(function (stream) {
-            stream.getAudioTracks().forEach(function (track) {
-                promises.push(createPromise(track));
-            });
-            stream.getVideoTracks().forEach(function (track) {
-                promises.push(createPromise(track));
-            });
-        });
+                            bytes = res.bytesSent - globalObject.video.prevBytesSent;
+                            globalObject.video.prevBytesSent = res.bytesSent;
 
-        that.peerConnection.getRemoteStreams().forEach(function (stream) {
-            stream.getAudioTracks().forEach(function (track) {
-                promises.push(createPromise(track));
-            });
-            stream.getVideoTracks().forEach(function (track) {
-                promises.push(createPromise(track));
-            });
-        });
+                            kilobytes = bytes / 1024;
 
-        return new Promise.all(promises).then(function(res) {
-            return res;
+                            result.video = merge(result.video, {
+                                availableBandwidth: kilobytes.toFixed(1),
+                                googFrameHeightInput: res.googFrameHeightInput,
+                                googFrameWidthInput: res.googFrameWidthInput,
+                                googCaptureQueueDelayMsPerS: res.googCaptureQueueDelayMsPerS,
+                                rtt: res.googRtt,
+                                packetsLost: res.packetsLost,
+                                packetsSent: res.packetsSent,
+                                googEncodeUsagePercent: res.googEncodeUsagePercent,
+                                googCpuLimitedResolution: res.googCpuLimitedResolution,
+                                googNacksReceived: res.googNacksReceived,
+                                googFrameRateInput: res.googFrameRateInput,
+                                googPlisReceived: res.googPlisReceived,
+                                googViewLimitedResolution: res.googViewLimitedResolution,
+                                googCaptureJitterMs: res.googCaptureJitterMs,
+                                googAvgEncodeMs: res.googAvgEncodeMs,
+                                googFrameHeightSent: res.googFrameHeightSent,
+                                googFrameRateSent: res.googFrameRateSent,
+                                googBandwidthLimitedResolution: res.googBandwidthLimitedResolution,
+                                googFrameWidthSent: res.googFrameWidthSent,
+                                googFirsReceived: res.googFirsReceived,
+                                bytesSent: res.bytesSent
+                            });
+                        }
+
+                        if (res.type == 'VideoBwe') {
+                            result.video.bandwidth = {
+                                googActualEncBitrate: res.googActualEncBitrate,
+                                googAvailableSendBandwidth: res.googAvailableSendBandwidth,
+                                googAvailableReceiveBandwidth: res.googAvailableReceiveBandwidth,
+                                googRetransmitBitrate: res.googRetransmitBitrate,
+                                googTargetEncBitrate: res.googTargetEncBitrate,
+                                googBucketDelay: res.googBucketDelay,
+                                googTransmitBitrate: res.googTransmitBitrate
+                            };
+                        }
+
+                        // res.googActiveConnection means either STUN or TURN is used.
+
+                        if (res.type == 'googCandidatePair' && res.googActiveConnection == 'true') {
+                            result.connectionType = {
+                                local: {
+                                    candidateType: res.googLocalCandidateType,
+                                    ipAddress: res.googLocalAddress
+                                },
+                                remote: {
+                                    candidateType: res.googRemoteCandidateType,
+                                    ipAddress: res.googRemoteAddress
+                                },
+                                transport: res.googTransportType
+                            };
+                        }
+                    }
+
+                    fulfill(result);
+                };
+
+            that.peerConnection.getStats(null, function (res) {
+                var items = [];
+                res.forEach(function (result) {
+                    items.push(result);
+                });
+                reformat(items);
+            }, reformat);
         });
     };
     return that;
