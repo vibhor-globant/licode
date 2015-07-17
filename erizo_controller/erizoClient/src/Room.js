@@ -803,7 +803,7 @@ Erizo.Room = function (spec) {
                 if (stream.hasOwnProperty("pc")) {
                     streamId = stream.getID();
                     if (stream.pc.hasOwnProperty("getStats")) {
-                        promises.push(_getStats(streamId, "", stream.pc));
+                        promises.push(_getStats(streamId, "", stream.pc, "local"));
                     } else {
                         for (jj in stream.pc) {
                             if (stream.pc.hasOwnProperty(jj)) {
