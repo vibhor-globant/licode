@@ -316,137 +316,23 @@ Erizo.ChromeStableStack = function (spec) {
     }
 
     that.getStats = function () {
-        return new Promise(function (fulfill) {
-            var globalObject = {
-                    audio: {},
-                    video: {}
-                },
-                merge = function merge(mergein, mergeto) {
-                    if (!mergein) {
-                        mergein = {};
-                    }
-                    if (!mergeto) {
-                        return mergein;
-                    }
-
-                    for (var item in mergeto) {
-                        mergein[item] = mergeto[item];
-                    }
-                    return mergein;
-                },
-                reformat = function (results) {
-                    var result = {
-                        audio: {},
-                        video: {},
-                        results: results,
+        return new Promise(function (fulfill, reject) {
+            that.peerConnection.getStats(null, function (res) {
+                var standardReport = {};
+                var reports = res.result();
+                reports.forEach(function (report) {
+                    var standardStats = {
+                        id: report.id,
+                        timestamp: report.timestamp,
+                        type: report.type
                     };
-                    var bytes = null,
-                        kilobytes = null;
-
-                    for (var i = 0; i < results.length; ++i) {
-                        var res = results[i];
-
-                        if (res.googCodecName == 'opus' && res.bytesSent) {
-                            if (!globalObject.audio.prevBytesSent) {
-                                globalObject.audio.prevBytesSent = res.bytesSent;
-                            }
-
-                            bytes = res.bytesSent - globalObject.audio.prevBytesSent;
-                            globalObject.audio.prevBytesSent = res.bytesSent;
-
-                            kilobytes = bytes / 1024;
-
-                            result.audio = merge(result.audio, {
-                                availableBandwidth: kilobytes.toFixed(1),
-                                inputLevel: res.audioInputLevel,
-                                packetsLost: res.packetsLost,
-                                rtt: res.googRtt,
-                                packetsSent: res.packetsSent,
-                                bytesSent: res.bytesSent
-                            });
-                        }
-
-                        if (res.googCodecName == 'VP8') {
-                            if (!globalObject.video.prevBytesSent) {
-                                globalObject.video.prevBytesSent = res.bytesSent;
-                            }
-
-                            bytes = res.bytesSent - globalObject.video.prevBytesSent;
-                            globalObject.video.prevBytesSent = res.bytesSent;
-
-                            kilobytes = bytes / 1024;
-
-                            result.video = merge(result.video, {
-                                availableBandwidth: kilobytes.toFixed(1),
-                                googFrameHeightInput: res.googFrameHeightInput,
-                                googFrameWidthInput: res.googFrameWidthInput,
-                                googCaptureQueueDelayMsPerS: res.googCaptureQueueDelayMsPerS,
-                                rtt: res.googRtt,
-                                packetsLost: res.packetsLost,
-                                packetsSent: res.packetsSent,
-                                googEncodeUsagePercent: res.googEncodeUsagePercent,
-                                googCpuLimitedResolution: res.googCpuLimitedResolution,
-                                googNacksReceived: res.googNacksReceived,
-                                googFrameRateInput: res.googFrameRateInput,
-                                googPlisReceived: res.googPlisReceived,
-                                googViewLimitedResolution: res.googViewLimitedResolution,
-                                googCaptureJitterMs: res.googCaptureJitterMs,
-                                googAvgEncodeMs: res.googAvgEncodeMs,
-                                googFrameHeightSent: res.googFrameHeightSent,
-                                googFrameRateSent: res.googFrameRateSent,
-                                googBandwidthLimitedResolution: res.googBandwidthLimitedResolution,
-                                googFrameWidthSent: res.googFrameWidthSent,
-                                googFirsReceived: res.googFirsReceived,
-                                bytesSent: res.bytesSent
-                            });
-                        }
-
-                        if (res.type == 'VideoBwe') {
-                            result.video.bandwidth = {
-                                googActualEncBitrate: res.googActualEncBitrate,
-                                googAvailableSendBandwidth: res.googAvailableSendBandwidth,
-                                googAvailableReceiveBandwidth: res.googAvailableReceiveBandwidth,
-                                googRetransmitBitrate: res.googRetransmitBitrate,
-                                googTargetEncBitrate: res.googTargetEncBitrate,
-                                googBucketDelay: res.googBucketDelay,
-                                googTransmitBitrate: res.googTransmitBitrate
-                            };
-                        }
-
-                        // res.googActiveConnection means either STUN or TURN is used.
-
-                        if (res.type == 'googCandidatePair' && res.googActiveConnection == 'true') {
-                            result.connectionType = {
-                                local: {
-                                    candidateType: res.googLocalCandidateType,
-                                    ipAddress: res.googLocalAddress
-                                },
-                                remote: {
-                                    candidateType: res.googRemoteCandidateType,
-                                    ipAddress: res.googRemoteAddress
-                                },
-                                transport: res.googTransportType
-                            };
-                        }
-                    }
-
-                    fulfill(result);
-                };
-
-            that.peerConnection.getStats(function (res) {
-                var items = [];
-                res.result().forEach(function (result) {
-                    var item = {};
-                    result.names().forEach(function (name) {
-                        item[name] = result.stat(name);
+                    report.names().forEach(function (name) {
+                        standardStats[name] = report.stat(name);
                     });
-                    item.id = result.id;
-                    item.type = result.type;
-                    item.timestamp = result.timestamp;
-                    items.push(item);
+                    standardReport[standardStats.id] = standardStats;
                 });
-                reformat(items);
-            });
+                fulfill(standardReport);
+            }, reject);
         });
     };
 
