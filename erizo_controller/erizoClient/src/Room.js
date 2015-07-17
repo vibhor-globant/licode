@@ -786,12 +786,13 @@ Erizo.Room = function (spec) {
     that.getStats = function (callback) {
         var stream,
             promises = [],
-            _getStats = function (_streamId, _pcId, _pc) {
+            _getStats = function (_streamId, _pcId, _pc, _type) {
                 return _pc.getStats().then(function (res) {
                     return {
                         stream: _streamId,
                         pc: _pcId,
-                        result: res
+                        result: res,
+                        type: _type
                     };
                 });
             },
@@ -808,7 +809,7 @@ Erizo.Room = function (spec) {
                             if (stream.pc.hasOwnProperty(jj)) {
                                 pc = stream.pc[jj];
                                 if (pc.hasOwnProperty("getStats")) {
-                                    promises.push(_getStats(streamId, jj, pc));
+                                    promises.push(_getStats(streamId, jj, pc, "local"));
                                 }
                             }
                         }
@@ -829,7 +830,7 @@ Erizo.Room = function (spec) {
                             if (stream.pc.hasOwnProperty(jj)) {
                                 pc = stream.pc[jj];
                                 if (pc.hasOwnProperty("getStats")) {
-                                    promises.push(_getStats(streamId, jj, pc));
+                                    promises.push(_getStats(streamId, jj, pc, "remote"));
                                 }
                             }
                         }
