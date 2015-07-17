@@ -317,7 +317,7 @@ Erizo.ChromeStableStack = function (spec) {
 
     that.getStats = function () {
         return new Promise(function (fulfill, reject) {
-            that.peerConnection.getStats(null, function (res) {
+            that.peerConnection.getStats(function (res) {
                 var standardReport = {};
                 var reports = res.result();
                 reports.forEach(function (report) {
