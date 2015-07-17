@@ -789,10 +789,12 @@ Erizo.Room = function (spec) {
             _getStats = function (_streamId, _pcId, _pc, _type) {
                 return _pc.getStats().then(function (res) {
                     return {
-                        stream: _streamId,
-                        pc: _pcId,
+                        meta: {
+                            stream: _streamId,
+                            pc: _pcId,
+                            type: _type
+                        },
                         result: res,
-                        type: _type
                     };
                 });
             },
