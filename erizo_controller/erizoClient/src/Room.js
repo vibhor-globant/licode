@@ -1,4 +1,4 @@
-/*global L, io, console*/
+/*global L, io, console, Promise*/
 /*
  * Class Room represents a Licode Room. It will handle the connection, local stream publication and
  * remote stream subscription.
@@ -784,52 +784,54 @@ Erizo.Room = function (spec) {
     };
 
     that.getStats = function (callback) {
-        var stream, result = {
-                local: {},
-                remote: {}
-            },
+        var stream,
             promises = [],
-            _getStats = function (streamId, pcId, pc) {
-                return pc.getStats().then(function (res) {
+            _getStats = function (_streamId, _pcId, _pc) {
+                return _pc.getStats().then(function (res) {
                     return {
-                        stream: streamId,
-                        pc: jj,
+                        stream: _streamId,
+                        pc: _pcId,
                         result: res
                     };
                 });
-            };
-        for (var index in that.localStreams) {
+            },
+            index, streamId, jj, pc;
+        for (index in that.localStreams) {
             if (that.localStreams.hasOwnProperty(index)) {
                 stream = that.localStreams[index];
-                var streamId = stream.getID();
-                if (!result.local[streamId]) {
-                    result.local[streamId] = {};
-                }
-                for (var jj in stream.pc) {
-                    if (stream.pc.hasOwnProperty(jj)) {
-                        result.local[streamId][jj] = {};
-                        var pc = stream.pc[jj];
-                        if ((typeof pc.getStats !== "undefined") && pc.getStats) {
-                            promises.push(_getStats(streamId, jj, pc));
+                if (stream.hasOwnProperty("pc")) {
+                    streamId = stream.getID();
+                    if (stream.pc.hasOwnProperty("getStats")) {
+                        promises.push(_getStats(streamId, "", stream.pc));
+                    } else {
+                        for (jj in stream.pc) {
+                            if (stream.pc.hasOwnProperty(jj)) {
+                                pc = stream.pc[jj];
+                                if (pc.hasOwnProperty("getStats")) {
+                                    promises.push(_getStats(streamId, jj, pc));
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        for (var index in that.remoteStreams) {
+        for (index in that.remoteStreams) {
             if (that.remoteStreams.hasOwnProperty(index)) {
                 stream = that.remoteStreams[index];
-                var streamId = stream.getID();
-                if (!result.local[streamId]) {
-                    result.local[streamId] = {};
-                }
-                for (var jj in stream.pc) {
-                    if (stream.pc.hasOwnProperty(jj)) {
-                        result.local[streamId][jj] = {};
-                        var pc = stream.pc[jj];
-                        if ((typeof pc.getStats !== "undefined") && pc.getStats) {
-                            promises.push(_getStats(streamId, jj, pc));
+                if (stream.hasOwnProperty("pc")) {
+                    streamId = stream.getID();
+                    if (stream.pc.hasOwnProperty("getStats")) {
+                        promises.push(_getStats(streamId, "", stream.pc));
+                    } else {
+                        for (jj in stream.pc) {
+                            if (stream.pc.hasOwnProperty(jj)) {
+                                pc = stream.pc[jj];
+                                if (pc.hasOwnProperty("getStats")) {
+                                    promises.push(_getStats(streamId, jj, pc));
+                                }
+                            }
                         }
                     }
                 }
