@@ -70,16 +70,21 @@ Erizo.FirefoxStack = function (spec) {
 
             if (!event.candidate.candidate.match(/a=/)) {
                 event.candidate.candidate = "a=" + event.candidate.candidate;
+            }
+
+//          sdpMid: that.peerConnection.localDescription.sdp.match(/m=[a-z]*/g)[event.candidate.sdpMLineIndex].match(/audio|video/)[0],
+            var candidateObject = {
+                sdpMLineIndex: event.candidate.sdpMLineIndex,
+                candidate: event.candidate.candidate
             };
 
             if (spec.remoteDescriptionSet) {
                 spec.callback({
                     type: 'candidate',
-                    candidate: event.candidate
+                    candidate: candidateObject
                 });
             } else {
-                spec.localCandidates.push(event.candidate);
-                console.log("Local Candidates stored: ", spec.localCandidates.length, spec.localCandidates);
+                spec.localCandidates.push(candidateObject);
             }
 
         } else {
