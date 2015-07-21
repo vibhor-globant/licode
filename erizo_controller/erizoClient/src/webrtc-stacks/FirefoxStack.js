@@ -22,7 +22,8 @@ Erizo.FirefoxStack = function (spec) {
 
     if (spec.stunServerUrl !== undefined) {
         that.pc_config.iceServers.push({
-            "url": spec.stunServerUrl
+            "url": spec.stunServerUrl,
+            "urls": [spec.stunServerUrl]
         });
     }
 
@@ -35,7 +36,8 @@ Erizo.FirefoxStack = function (spec) {
             that.pc_config.iceServers.push({
                 username: turnServer.username,
                 credential: turnServer.password,
-                url: turnServer.url
+                url: turnServer.url,
+                urls: [turnServer.url]
             });
         }
     });
