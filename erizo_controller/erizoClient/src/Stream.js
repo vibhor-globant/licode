@@ -127,11 +127,18 @@ Erizo.Stream = function (spec) {
             if ((that.stream !== undefined) && !options.dontStop) {
 //                that.stream.stop();
                   that.stream.getAudioTracks().forEach(function (track) {
-                    track.stop();
+                    if (typeof track.stop === "function") {
+                        track.stop();
+                    }
                   });
                   that.stream.getVideoTracks().forEach(function (track) {
-                    track.stop();
+                    if (typeof track.stop === "function") {
+                        track.stop();
+                    }
                   });
+                  if (typeof that.stream.stop === "function") {
+                      that.stream.stop();
+                  }
             }
             that.stream = undefined;
         }
