@@ -125,7 +125,13 @@ Erizo.Stream = function (spec) {
             // Remove HTML element
             that.hide();
             if ((that.stream !== undefined) && !options.dontStop) {
-                that.stream.stop();
+//                that.stream.stop();
+                  that.stream.getAudioTracks().forEach(function (track) {
+                    track.stop();
+                  });
+                  that.stream.getVideoTracks().forEach(function (track) {
+                    track.stop();
+                  });
             }
             that.stream = undefined;
         }
