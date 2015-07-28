@@ -2,7 +2,7 @@
 
 var Erizo = Erizo || {};
 
-Erizo.InternetExplorerStack = function(spec) {
+Erizo.InternetExplorerStack = function (spec) {
     "use strict";
 
     var that = {},
@@ -35,7 +35,7 @@ Erizo.InternetExplorerStack = function(spec) {
     //         "url": spec.turnServer.url
     //     });
     // }
-    (spec.turnServers || []).forEach(function(turnServer) {
+    (spec.turnServers || []).forEach(function (turnServer) {
         if (turnServer.url) {
             that.pc_config.iceServers.push({
                 username: turnServer.username,
@@ -60,13 +60,13 @@ Erizo.InternetExplorerStack = function(spec) {
         }
     };
 
-    var errorCallback = function(message) {
+    var errorCallback = function (message) {
         console.log("Error in Stack ", message);
     }
 
     that.peerConnection = new WebkitRTCPeerConnection(that.pc_config, that.con);
 
-    var setMaxBW = function(sdp) {
+    var setMaxBW = function (sdp) {
         if (spec.video && spec.maxVideoBW) {
             var a = sdp.match(/m=video.*\r\n/);
             if (a == null) {
@@ -95,7 +95,7 @@ Erizo.InternetExplorerStack = function(spec) {
     /**
      * Closes the connection.
      */
-    that.close = function() {
+    that.close = function () {
         that.state = 'closed';
         console.log("close: calling peerConnection.close");
         that.peerConnection.close();
@@ -103,7 +103,7 @@ Erizo.InternetExplorerStack = function(spec) {
 
     spec.localCandidates = [];
 
-    that.peerConnection.onicecandidate = function(event) {
+    that.peerConnection.onicecandidate = function (event) {
         console.log("peerConnection.onicecandidate");
         if (event.candidate) {
             if (spec.turnOnly && !event.candidate.candidate.match(/relay/)) {
@@ -135,38 +135,40 @@ Erizo.InternetExplorerStack = function(spec) {
         }
     };
 
-    that.peerConnection.onaddstream = function(stream) {
+    that.peerConnection.onaddstream = function (stream) {
         console.log("peerConnection.onaddstream");
         if (that.onaddstream) {
             that.onaddstream(stream);
         }
     };
 
-    that.peerConnection.onremovestream = function(stream) {
+    that.peerConnection.onremovestream = function (stream) {
         console.log("peerConnection.onremovestream");
         if (that.onremovestream) {
             that.onremovestream(stream);
         }
     };
 
-    that.peerConnection.onnegotiationneeded = function() {
+    that.peerConnection.onnegotiationneeded = function () {
         console.log("peerConnection.onnegotiationneeded");
     };
 
-    that.peerConnection.oniceconnectionstatechange = function(evt) {
+    that.peerConnection.oniceconnectionstatechange = function (evt) {
         console.log("peerConnection.oniceconnectionstatechange state = " + that.peerConnection.iceConnectionState);
         if (spec.pcUpdate) {
-            spec.pcUpdate("oniceconnectionstatechange", {iceConnectionState: that.peerConnection.iceConnectionState});
+            spec.pcUpdate("oniceconnectionstatechange", {
+                iceConnectionState: that.peerConnection.iceConnectionState
+            });
         }
     };
 
-    that.peerConnection.onsignalingstatechange = function(evt) {
+    that.peerConnection.onsignalingstatechange = function (evt) {
         console.log("peerConnection.onsignalingstatechange state = " + that.peerConnection.signalingState);
     };
 
     var localDesc;
 
-    var setLocalDesc = function(sessionDescription) {
+    var setLocalDesc = function (sessionDescription) {
         console.log("setLocalDesc");
         sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
         sessionDescription.sdp = sessionDescription.sdp.replace(/a=ice-options:google-ice\r\n/g, "");
@@ -178,7 +180,7 @@ Erizo.InternetExplorerStack = function(spec) {
         //that.peerConnection.setLocalDescription(sessionDescription);
     }
 
-    var setLocalDescp2p = function(sessionDescription) {
+    var setLocalDescp2p = function (sessionDescription) {
         console.log("setLocalDescp2p");
         sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
         sessionDescription.sdp = sessionDescription.sdp.replace(/a=ice-options:google-ice\r\n/g, "");
@@ -188,14 +190,14 @@ Erizo.InternetExplorerStack = function(spec) {
         });
         localDesc = sessionDescription;
         console.log("setLocalDescp2p: calling peerConnection.setLocalDescription");
-        that.peerConnection.setLocalDescription(sessionDescription, function() {
+        that.peerConnection.setLocalDescription(sessionDescription, function () {
             console.log("setLocalDescp2p: setLocalDescription successful");
-        }, function(err) {
+        }, function (err) {
             console.log("setLocalDescp2p: setLocalDescription error = " + err);
         });
     }
 
-    that.createOffer = function(isSubscribe) {
+    that.createOffer = function (isSubscribe) {
         console.log("createOffer: calling peerConnection.createOffer");
         if (isSubscribe === true) {
             that.peerConnection.createOffer(setLocalDesc, errorCallback, that.mediaConstraints);
@@ -205,7 +207,7 @@ Erizo.InternetExplorerStack = function(spec) {
 
     };
 
-    that.addStream = function(stream) {
+    that.addStream = function (stream) {
         console.log("addStream calling peerConnection.addStream");
         that.peerConnection.addStream(stream);
     };
@@ -213,20 +215,20 @@ Erizo.InternetExplorerStack = function(spec) {
 
     spec.remoteDescriptionSet = false;
 
-    that.processSignalingMessage = function(msg) {
+    that.processSignalingMessage = function (msg) {
         //console.log("Process Signaling Message", msg);
 
         if (msg.type === 'offer') {
             msg.sdp = setMaxBW(msg.sdp);
             console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
-            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
+            that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
                 console.log("processSignalingMessage: peerConnection.setRemoteDescription successful");
                 console.log("processSignalingMessage: calling peerConnection.createAnswer");
-                that.peerConnection.createAnswer(setLocalDescp2p, function(err) {
+                that.peerConnection.createAnswer(setLocalDescp2p, function (err) {
                     console.log("processSignalingMessage: peerConnection.createAnswer error = " + err);
                 }, that.mediaConstraints);
                 spec.remoteDescriptionSet = true;
-            }, function(err) {
+            }, function (err) {
                 console.log("Set remote description failed with error: " + err + ", msg = " + JSON.stringify(msg));
             });
 
@@ -244,10 +246,10 @@ Erizo.InternetExplorerStack = function(spec) {
             msg.sdp = setMaxBW(msg.sdp);
 
             console.log("processSignalingMessage: calling peerConnection.setLocalDescription");
-            that.peerConnection.setLocalDescription(localDesc, function() {
+            that.peerConnection.setLocalDescription(localDesc, function () {
                 console.log("processSignalingMessage: peerConnection.setLocalDescription successful");
                 console.log("processSignalingMessage: calling peerConnection.setRemoteDescription");
-                that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function() {
+                that.peerConnection.setRemoteDescription(new RTCSessionDescription(msg), function () {
                     spec.remoteDescriptionSet = true;
                     console.log("Candidates to be added: ", spec.remoteCandidates.length, spec.remoteCandidates);
                     while (spec.remoteCandidates.length > 0) {
@@ -263,17 +265,17 @@ Erizo.InternetExplorerStack = function(spec) {
                             candidate: spec.localCandidates.shift()
                         });
                     }
-                }, function(err) {
+                }, function (err) {
                     console.log("processSignalingMessage: peerConnection.setRemoteDescription error = " + err);
                 });
-            }, function(err) {
+            }, function (err) {
                 console.log("processSignalingMessage: peerConnection.setLocalDescription error = " + err);
             });
 
         } else if (msg.type === 'candidate') {
             try {
                 var obj;
-                if (typeof(msg.candidate) === 'object') {
+                if (typeof (msg.candidate) === 'object') {
                     obj = msg.candidate;
                 } else {
                     obj = JSON.parse(msg.candidate);
@@ -292,7 +294,29 @@ Erizo.InternetExplorerStack = function(spec) {
                 L.Logger.error("Error parsing candidate", msg.candidate);
             }
         }
-    }
+    };
+
+    that.getStats = function () {
+        return new Promise(function (fulfill, reject) {
+            that.peerConnection.getStats(function (res) {
+                var standardReport = {};
+                var reports = res.result();
+                reports.forEach(function (report) {
+                    var standardStats = {
+                        id: report.id,
+                        timestamp: report.timestamp,
+                        type: report.type
+                    };
+                    report.names().forEach(function (name) {
+                        standardStats[name] = report.stat(name);
+                    });
+                    standardReport[standardStats.id] = standardStats;
+                });
+                fulfill(standardReport);
+            }, reject);
+        });
+    };
+
 
     return that;
 };
