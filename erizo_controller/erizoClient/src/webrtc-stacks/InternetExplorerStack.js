@@ -313,7 +313,7 @@ Erizo.InternetExplorerStack = function (spec) {
                     standardReport[standardStats.id] = standardStats;
                 });
                 fulfill(standardReport);
-            }, reject);
+            });
         });
     };
 
