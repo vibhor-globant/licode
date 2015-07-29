@@ -81,9 +81,9 @@ Erizo.Room = function (spec) {
 
             // Close PC stream
             if (stream.pc) stream.pc.close();
-            if (stream.local) {
-                stream.stream.stop();
-            }
+//            if (stream.local) {
+//                stream.stream.stop();
+//            }
         }
     };
 

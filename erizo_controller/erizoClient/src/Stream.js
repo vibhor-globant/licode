@@ -87,20 +87,25 @@ Erizo.Stream = function (spec) {
           }
           var opt = {video: videoOpt, audio: spec.audio, fake: spec.fake, screen: spec.screen, extensionId:that.extensionId};
           L.Logger.debug(opt);
-          Erizo.GetUserMedia(opt, function (stream) {
-            //navigator.webkitGetUserMedia("audio, video", function (stream) {
+          if (!that.stream) {
+              Erizo.GetUserMedia(opt, function (stream) {
+                //navigator.webkitGetUserMedia("audio, video", function (stream) {
 
-            L.Logger.info("User has granted access to local media.");
-            that.stream = stream;
+                L.Logger.info("User has granted access to local media.");
+                that.stream = stream;
 
-            var streamEvent = Erizo.StreamEvent({type: "access-accepted"});
-            that.dispatchEvent(streamEvent);
+                var streamEvent = Erizo.StreamEvent({type: "access-accepted"});
+                that.dispatchEvent(streamEvent);
 
-          }, function (error) {
-            L.Logger.error("Failed to get access to local media. Error code was " + error.code + ".");
-            var streamEvent = Erizo.StreamEvent({type: "access-denied"});
-            that.dispatchEvent(streamEvent);
-          });
+              }, function (error) {
+                L.Logger.error("Failed to get access to local media. Error code was " + error.code + ".");
+                var streamEvent = Erizo.StreamEvent({type: "access-denied"});
+                that.dispatchEvent(streamEvent);
+              });
+          } else {
+                var streamEvent = Erizo.StreamEvent({type: "access-accepted"});
+                that.dispatchEvent(streamEvent);
+          }
           } else {
             var streamEvent = Erizo.StreamEvent({type: "access-accepted"});
             that.dispatchEvent(streamEvent);
@@ -111,15 +116,29 @@ Erizo.Stream = function (spec) {
       };
 
 
-     that.close = function () {
+     that.close = function (options) {
+        options = options || {};
         if (that.local) {
             if (that.room !== undefined) {
                 that.room.unpublish(that);
             }
             // Remove HTML element
             that.hide();
-            if (that.stream !== undefined) {
-                that.stream.stop();
+            if ((that.stream !== undefined) && !options.dontStop) {
+//                that.stream.stop();
+                  that.stream.getAudioTracks().forEach(function (track) {
+                    if (typeof track.stop === "function") {
+                        track.stop();
+                    }
+                  });
+                  that.stream.getVideoTracks().forEach(function (track) {
+                    if (typeof track.stop === "function") {
+                        track.stop();
+                    }
+                  });
+                  if (typeof that.stream.stop === "function") {
+                      that.stream.stop();
+                  }
             }
             that.stream = undefined;
         }
