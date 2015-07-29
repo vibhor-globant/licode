@@ -300,6 +300,10 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     return;
   }
 
+  if(window.location.pathname !== '/webrtc_requirements'){
+    window.location = '/webrtc_requirements';
+  }
+
   var w = window;
   var i = document.createElement('iframe');
   i.style.position = 'fixed';
