@@ -301,7 +301,7 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
   }
 
   if(window.location.pathname !== '/webrtc_requirements'){
-    if(window.navigator.userAgent.match("MSIE")){
+    if (window.navigator.userAgent.match("Trident") || window.navigator.userAgent.match("MSIE")){
       window.location = '/webrtc_requirements?ie_browser=true';
     }else{
       window.location = '/webrtc_requirements';
