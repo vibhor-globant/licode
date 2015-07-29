@@ -300,8 +300,10 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     return;
   }
 
-  if(window.location.pathname !== '/webrtc_requirements'){
-    if (window.navigator.userAgent.match("Trident") || window.navigator.userAgent.match("MSIE")){
+  if(window.location.pathname !== '/webrtc_requirements'){    
+    var ua = window.navigator.userAgent;
+    var msie = ua.indexOf("MSIE ");      
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
       window.location = '/webrtc_requirements?ie_browser=true';
     }else{
       window.location = '/webrtc_requirements';
