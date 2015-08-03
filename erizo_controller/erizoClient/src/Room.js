@@ -794,7 +794,7 @@ Erizo.Room = function (spec) {
                             pc: _pcId,
                             type: _type
                         },
-                        result: res,
+                        result: res
                     };
                 });
             },
