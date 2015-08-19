@@ -66,10 +66,10 @@ AdapterJS.WebRTCPlugin.pluginInfo = {
   companyName: 'Temasys'
 };
 if(!!navigator.platform.match(/^Mac/i)) {
-  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1n77hco';
+  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1eVjRvE';
 }
 else if(!!navigator.platform.match(/^Win/i)) {
-  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1kkS4FN';
+  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1LazKLg';
 }
 
 // Unique identifier of each opened page
@@ -300,15 +300,15 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     return;
   }
 
-  if(window.location.pathname !== '/webrtc_requirements'){    
+  if(window.location.pathname !== '/webrtc_requirements'){
     var ua = window.navigator.userAgent;
-    var msie = ua.indexOf("MSIE ");      
+    var msie = ua.indexOf("MSIE ");
     if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
       window.location = '/webrtc_requirements?ie_browser=true';
-    }else{
+    }else if (navigator.userAgent.match(/Safari/) && !navigator.userAgent.match(/Chrome/)){
       window.location = '/webrtc_requirements';
     }
-    
+
   }
 
   var w = window;
