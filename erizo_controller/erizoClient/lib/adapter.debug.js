@@ -308,7 +308,9 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     }else if (navigator.userAgent.match(/Safari/) && !navigator.userAgent.match(/Chrome/)){
       window.location = '/webrtc_requirements';
     }
-
+    else {
+        return;
+    }
   }
 
   var w = window;
