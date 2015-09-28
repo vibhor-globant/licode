@@ -301,12 +301,18 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
   }
 
   if(window.location.pathname !== '/webrtc_requirements'){
+    var currentLocation = window.location.pathname;
+    var collaboration = null;
+    if(currentLocation.match("collaborations")){
+      currentLocationArray = currentLocation.split("/");
+      collaboration = "collaboration_id=" + currentLocationArray[currentLocationArray.length - 1];
+    }
     var ua = window.navigator.userAgent;
     var msie = ua.indexOf("MSIE ");
     if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-      window.location = '/webrtc_requirements?ie_browser=true';
+      window.location = '/webrtc_requirements?ie_browser=true&' + collaboration;
     }else if (navigator.userAgent.match(/Safari/) && !navigator.userAgent.match(/Chrome/)){
-      window.location = '/webrtc_requirements';
+      window.location = '/webrtc_requirements?' + collaboration;
     }
     else {
         return;
